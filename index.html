@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>duchess // by khizer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Michroma&family=Raleway+Dots&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-grey: rgba(160, 160, 162, 1);
+      --bg-void: #000000;
+      --hover-color: #ffffff; /* Default fallback */
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: #fff; 
+      font-family: sans-serif; 
+      overflow-x: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation */
+    .nav-header-bar { position: absolute; top: 40px; left: 8vw; display: flex; gap: 40px; z-index: 100; }
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-family: 'Host Grotesk', sans-serif; 
+      font-weight: 700; 
+      font-size: 24px; 
+      transition: color 0.3s; 
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    .nav-item:hover { color: var(--hover-color); }
+    .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
+
+    /* Layout Columns */
+    .left-editorial-column { position: absolute; left: 8vw; top: 25vh; width: 84vw; height: 65vh; display: flex; flex-direction: column; justify-content: space-between; }
+    
+    /* Image and Branding Alignment */
+    .branding-container { position: relative; display: flex; align-items: flex-end; }
+    .duchess-wrapper { position: relative; display: inline-block; }
+    
+    .text-5 { font-family: 'Host Grotesk', sans-serif; font-size: clamp(80px, 11vw, 180px); font-weight: 700; color: var(--text-grey); letter-spacing: -0.08em; z-index: 2; position: relative; }
+    .portrait-behind { position: absolute; left: 100%; top: 50%; transform: translateY(-50%); width: 450px; height: auto; z-index: -1; margin-left: 20px; }
+    .text-17 { font-family: 'Host Grotesk', sans-serif; font-style: italic; font-weight: 700; font-size: 40px; margin-left: 30px; margin-bottom: 12px; color: var(--text-grey); }
+
+    /* Bottom Dock */
+    .bottom-dock-alignment-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; padding-bottom: 20px; }
+    #album-art { width: 150px; height: 150px; display: none; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .clock-coordinates-group { text-align: right; color: var(--text-grey); font-family: 'Raleway Dots', monospace; }
+	
+	/* Mobile Responsiveness for index.html */
+@media (max-width: 768px) {
+  /* Tighten Navigation */
+  .nav-header-bar {
+    top: 25px;
+    left: 20px;
+    gap: 18px;
+  }
+  .nav-item {
+    font-size: 18px;
+  }
+
+  /* Adjust Main Layout Column */
+  .left-editorial-column {
+    left: 5vw;
+    width: 90vw;
+    top: 14vh;
+    height: auto;
+    position: relative;
+  }
+
+  /* Stack Branding & Subtitle */
+  .branding-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .text-5 {
+    font-size: clamp(52px, 16vw, 90px);
+  }
+  .text-17 {
+    margin-left: 0;
+    margin-top: 5px;
+    font-size: 24px;
+  }
+
+  /* Bring the portrait back on-screen instead of sticking out to the right */
+  .portrait-behind {
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    width: 100%;
+    max-width: 280px;
+    margin: 20px 0;
+    display: block;
+  }
+
+  /* Stack Clock and Spotify dock vertically */
+  .bottom-dock-alignment-row {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 30px;
+    margin-top: 40px;
+    padding-bottom: 50px;
+  }
+
+  .clock-coordinates-group {
+    text-align: left;
+  }
+  #live-time { font-size: 32px !important; }
+  #live-date { font-size: 22px !important; }
+}
+  </style>
+</head>
+<body>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item active">info</a>
+    <a href="projects.html" class="nav-item">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+
+  <div class="left-editorial-column">
+    <div class="branding-container">
+      <div class="duchess-wrapper">
+        <p class="text-5">duchess.</p>
+        <img src="assets/images/Portrait.png" class="portrait-behind" alt="Portrait" />
+      </div>
+      <p class="text-17">by khizer</p>
+    </div>
+
+    <div class="bottom-dock-alignment-row">
+      <div class="embed-1-3-music">
+        <img id="album-art" src="" alt="Album Art" />
+        <div id="status-label" style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight:700; opacity:0.5; margin-top:10px; color: #fff;">LOADING...</div>
+      </div>
+      <div class="clock-coordinates-group">
+        <p id="live-time" style="font-size: 40px;"></p>
+        <p id="live-date" style="font-size: 30px;"></p>
+        <p style="font-family: 'Michroma', sans-serif; font-size: 18px; margin-top: 10px;">43.6548° N, 79.3884° W</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Navigation Hover Colors
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('mouseover', () => {
+        // Do not change color if the item is the active page
+        if (!item.classList.contains('active')) {
+          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+        }
+      });
+    });
+
+    // 2. Clock Logic
+    function refresh() {
+      const now = new Date();
+      document.getElementById('live-time').innerText = now.toLocaleTimeString();
+      document.getElementById('live-date').innerText = now.toLocaleDateString();
+    }
+    setInterval(refresh, 1000);
+    refresh();
+
+    // 3. Spotify/Last.fm Logic with Failsafes
+    async function streamMusicData() {
+      const apiKey = '3d6237a6791e154201820a0cf2f60f61';
+      const username = 'khizerthewzrd';
+      const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json&limit=1&_ts=${Date.now()}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.recenttracks && data.recenttracks.track && data.recenttracks.track.length > 0) {
+          const track = Array.isArray(data.recenttracks.track) ? data.recenttracks.track[0] : data.recenttracks.track;
+          const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+          
+          const statusLabel = document.getElementById('status-label');
+          const art = document.getElementById('album-art');
+          
+          if (isNowPlaying) {
+            statusLabel.innerText = 'NOW PLAYING: ' + track.name.toUpperCase();
+          } else {
+            statusLabel.innerText = 'LAST PLAYED: ' + track.name.toUpperCase();
+          }
+
+          if (track.image && track.image[3] && track.image[3]['#text']) {
+            art.src = track.image[3]['#text'];
+            art.style.display = 'block';
+          } else {
+            art.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.error("API Error:", e);
+        document.getElementById('status-label').innerText = 'STATUS: // API OFFLINE';
+      }
+    }
+    
+    streamMusicData();
+    setInterval(streamMusicData, 30000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<header class="nav-header-bar">
+    <a href="index.html" class="nav-item">info</a>
+    <a href="projects.html" class="nav-item active">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+  
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>under_construction // duchess</title>
+  <style>
+    :root { --text-grey: rgba(160, 160, 162, 1); --bg-void: #000000; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background-color: var(--bg-void); 
+      color: #fff; 
+      font-family: 'Host Grotesk', sans-serif;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation */
+    .nav-header-bar { position: absolute; top: 40px; left: 8vw; display: flex; gap: 40px; z-index: 100; }
+    .nav-item { 
+      text-decoration: none; color: var(--text-grey); font-weight: 700; font-size: 24px; transition: color 0.3s;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
+
+    /* Construction Text */
+    .splash-container { position: absolute; left: 8vw; top: 35vh; }
+    .status-text { font-size: clamp(40px, 6vw, 80px); font-weight: 700; color: var(--text-grey); letter-spacing: -0.02em; }
+    .sub-text { font-family: monospace; color: var(--text-grey); margin-top: 10px; font-size: 18px; }
+	
+	/* Mobile Responsiveness for Splash Pages */
+@media (max-width: 600px) {
+  .nav-header-bar {
+    top: 25px;
+    left: 20px;
+    gap: 18px;
+  }
+  .nav-item {
+    font-size: 18px;
+  }
+
+  .splash-container {
+    left: 20px;
+    top: 30vh;
+    padding-right: 20px;
+  }
+  .status-text {
+    font-size: 32px;
+  }
+  .sub-text {
+    font-size: 13px;
+    word-break: break-word;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item">info</a>
+    <!-- Adjust class="active" depending on which file this is -->
+    <a href="projects.html" class="nav-item active">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+
+  <div class="splash-container">
+    <p class="status-text">SYSTEM_BUILDING_</p>
+    <p class="sub-text">THIS_DIRECTORY_IS_CURRENTLY_UNDER_DEVELOPMENT</p>
+  </div>
+
+</body>
+</html>
