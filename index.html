@@ -3,236 +3,342 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Duchess Studios</title>
+  <title>info // duchess</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Michroma&family=Raleway+Dots&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
   <style>
-    /* ==========================================================================
-       RESET & BASE STYLES
-       ========================================================================== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --text-grey: rgba(160, 160, 162, 1);
+      --bg-void: #000000;
+      --hover-color: #ffffff;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0d0d0d;
-      color: #ffffff;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: #fff; 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
       min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
     }
 
-    /* ==========================================================================
-       HERO CONTAINER & PORTRAIT BACKGROUND (LAYERED BEHIND TEXT)
-       ========================================================================== */
-    .hero-container {
-      position: relative;
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 48px;
-      overflow: hidden;
+    /* Navigation */
+    .nav-header-bar { position: absolute; top: 40px; left: 8vw; display: flex; gap: 40px; z-index: 100; }
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-weight: 700; 
+      font-size: 24px; 
+      transition: color 0.3s;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
     }
+    .nav-item:hover { color: var(--hover-color); }
+    .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
 
-    .portrait-bg {
+    /* Main Left Editorial Layout */
+    .left-editorial-column {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      z-index: 1;
-      opacity: 0.35;
-      pointer-events: none;
+      top: 22vh;
+      left: 8vw;
+      width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
 
-    .content-layer {
+    .branding-container {
       position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: calc(100vh - 96px);
     }
 
-    /* ==========================================================================
-       HEADER: BIGGER LOGO + "BY KHIZER"
-       ========================================================================== */
-    .brand-header {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-    }
-
-    .duchess-logo {
-      height: 54px;
-      width: auto;
-      display: block;
-    }
-
-    .byline {
-      font-size: 18px;
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      opacity: 0.8;
-      white-space: nowrap;
-    }
-
-    /* ==========================================================================
-       HERO TEXT
-       ========================================================================== */
-    .hero-text {
-      max-width: 650px;
-      margin: 40px 0;
-    }
-
-    .hero-text h1 {
-      font-size: 42px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      letter-spacing: -0.03em;
-    }
-
-    .hero-text p {
-      font-size: 18px;
-      line-height: 1.5;
-      color: #a0a0a0;
-    }
-
-    /* ==========================================================================
-       SPOTIFY API & META BLOCK
-       ========================================================================== */
-    .widgets-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-width: 400px;
-    }
-
-    .spotify-placeholder {
-      width: 100%;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: #1db954;
-    }
-
-    .meta-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: "SF Mono", "Courier New", Courier, monospace;
-      font-size: 12px;
-      letter-spacing: 0.06em;
+    /* "by khizer" styling */
+    .text-17 {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-grey);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.65);
     }
 
-    .meta-separator {
-      opacity: 0.4;
+    /* "duchess." Title */
+    .text-5 {
+      font-size: clamp(64px, 10vw, 110px);
+      font-weight: 800;
+      letter-spacing: -4px;
+      line-height: 0.88;
+      color: #ffffff;
+      text-transform: lowercase;
     }
 
-    /* ==========================================================================
-       MOBILE RESPONSIVE OVERRIDES
-       ========================================================================== */
+    .editorial-bio {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-grey);
+      font-weight: 400;
+    }
+
+    .editorial-bio span {
+      color: #ffffff;
+    }
+
+    /* Bottom Dock & Coordinates */
+    .bottom-dock-alignment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
+      margin-top: 15vh;
+    }
+
+    .clock-coordinates-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #live-time {
+      font-family: monospace;
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #ffffff;
+    }
+
+    #live-date {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-grey);
+      letter-spacing: 2px;
+    }
+
+    /* Spotify Dock Styles */
+    .spotify-dock-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .motif-label {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-grey);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .spotify-dock {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .spotify-dock img {
+      width: 48px;
+      height: 48px;
+      border-radius: 2px;
+      border: 1px solid #222;
+      object-fit: cover;
+    }
+
+    .spotify-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .spotify-status {
+      font-family: monospace;
+      font-size: 10px;
+      color: #666;
+      letter-spacing: 1.5px;
+    }
+
+    .spotify-track {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .spotify-artist {
+      font-size: 13px;
+      color: var(--text-grey);
+      font-weight: 400;
+    }
+
+    /* Mobile Layout Adjustments */
     @media (max-width: 768px) {
-      .hero-container {
-        padding: 24px;
+      .nav-header-bar {
+        top: 25px;
+        left: 20px;
+        gap: 18px;
+      }
+      .nav-item {
+        font-size: 18px;
       }
 
-      .content-layer {
-        min-height: calc(100vh - 48px);
+      .left-editorial-column {
+        left: 5vw;
+        width: 90vw;
+        top: 14vh;
+        position: relative;
+        gap: 24px;
       }
 
-      .brand-header {
-        gap: 10px;
-      }
-
-      .duchess-logo {
-        height: 38px;
-      }
-
-      .byline {
-        font-size: 14px;
-      }
-
-      .hero-text h1 {
-        font-size: 30px;
-      }
-
-      .hero-text p {
-        font-size: 15px;
-      }
-
-      .widgets-wrapper {
-        max-width: 100%;
-      }
-
-      .meta-block {
+      .branding-container {
+        position: relative;
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-        font-size: 11px;
+        margin-top: 20px;
       }
 
-      .meta-separator {
-        display: none;
+      .text-5 {
+        font-size: clamp(56px, 17vw, 90px);
+        position: relative;
+        z-index: 2;
       }
+
+      .text-17 {
+        position: absolute;
+        top: -28px;
+        left: -8px;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-grey);
+        z-index: 1;
+        white-space: nowrap;
+      }
+
+      .bottom-dock-alignment-row {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 30px;
+        margin-top: 40px;
+        padding-bottom: 60px;
+      }
+
+      .clock-coordinates-group {
+        position: relative;
+        z-index: 10;
+        text-align: left;
+      }
+
+      #live-time { font-size: 30px !important; }
+      #live-date { font-size: 20px !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- MAIN CONTAINER WITH BACKGROUND PORTRAIT -->
-  <main class="hero-container">
+  <!-- Navigation -->
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item active">info</a>
+    <a href="projects.html" class="nav-item">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+
+  <!-- Editorial Content Column -->
+  <main class="left-editorial-column">
     
-    <!-- PORTRAIT (LAYERED BEHIND EVERYTHING) -->
-    <img src="portrait.png" alt="Portrait Background" class="portrait-bg" />
+    <div class="branding-container">
+      <div class="text-17">by khizer</div>
+      <h1 class="text-5">duchess.</h1>
+    </div>
 
-    <!-- FOREGROUND CONTENT LAYER -->
-    <div class="content-layer">
+    <p class="editorial-bio">
+      Boutique design and marketing studio operating out of <span>Toronto</span>. Focused on brand identity systems, typography, print ephemera, and selective cross-disciplinary collaborations.
+    </p>
 
-      <!-- HEADER: LOGO + BYLINE -->
-      <header class="brand-header">
-        <img src="duchess-logo.svg" alt="Duchess Studios" class="duchess-logo" />
-        <span class="byline">by khizer</span>
-      </header>
+    <!-- Bottom Dock: Coordinates & Spotify Motif -->
+    <div class="bottom-dock-alignment-row">
+      
+      <!-- Time & Coordinates -->
+      <div class="clock-coordinates-group">
+        <div id="live-time">00:00:00</div>
+        <div id="live-date">43.6532° N, 79.3832° W</div>
+      </div>
 
-      <!-- MAIN HERO TEXT SECTION -->
-      <section class="hero-text">
-        <h1>Duchess Studios</h1>
-        <p>Boutique design & creative studio bridging typography, physical utility objects, and brand identity.</p>
-      </section>
-
-      <!-- WIDGET & META SECTION -->
-      <section class="widgets-wrapper">
-        
-        <!-- SPOTIFY API CONTAINER -->
-        <div class="spotify-widget">
-          <!-- PASTE YOUR SPOTIFY API EMBED / CODE HERE -->
-          <div class="spotify-placeholder">
-            <span>Spotify API Integration</span>
+      <!-- Spotify API Widget -->
+      <div class="spotify-dock-wrapper">
+        <div class="motif-label">// MOTIF</div>
+        <div class="spotify-dock" id="spotify-dock">
+          <img id="spotify-art" src="" alt="Album Art" style="display: none;" />
+          <div class="spotify-details">
+            <div id="spotify-status" class="spotify-status">STATUS // OFFLINE</div>
+            <div id="spotify-track" class="spotify-track"></div>
+            <div id="spotify-artist" class="spotify-artist"></div>
           </div>
         </div>
-
-        <!-- DATE / TIME / LOCATION BLOCK -->
-        <div class="meta-block">
-          <span class="meta-item location">Toronto, ON</span>
-          <span class="meta-separator">•</span>
-          <span class="meta-item datetime">Jul 21, 2026 // 13:41 EDT</span>
-        </div>
-
-      </section>
+      </div>
 
     </div>
+
   </main>
+
+  <script>
+    // Live Clock Updater
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('live-time').innerText = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Spotify Widget Updater (Replace SP_USER_ID or endpoint as needed)
+    async function updateSpotify() {
+      const SP_USER_ID = 'YOUR_DISCORD_OR_LASTFM_ID'; 
+
+      try {
+        const res = await fetch(`https://api.lanyard.rest/v1/users/${SP_USER_ID}`);
+        const data = await res.json();
+
+        const statusEl = document.getElementById('spotify-status');
+        const trackEl = document.getElementById('spotify-track');
+        const artistEl = document.getElementById('spotify-artist');
+        const artEl = document.getElementById('spotify-art');
+
+        if (data.data && data.data.spotify) {
+          const sp = data.data.spotify;
+          statusEl.innerText = 'NOW_PLAYING //';
+          trackEl.innerText = sp.song;
+          artistEl.innerText = sp.artist;
+          artEl.src = sp.album_art_url;
+          artEl.style.display = 'block';
+        } else {
+          statusEl.innerText = 'STATUS // OFFLINE';
+          trackEl.innerText = 'NOTHING PLAYING';
+          artistEl.innerText = '';
+          artEl.style.display = 'none';
+        }
+      } catch (err) {
+        // Fallback or quiet catch if offline/unconfigured
+        document.getElementById('spotify-status').innerText = 'STATUS // OFFLINE';
+        document.getElementById('spotify-track').innerText = 'NOTHING PLAYING';
+      }
+    }
+    updateSpotify();
+    setInterval(updateSpotify, 10000);
+
+    // Navigation Hover Accent Colors
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('mouseover', () => {
+        if (!item.classList.contains('active')) {
+          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
