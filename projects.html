@@ -1,79 +1,383 @@
-<header class="nav-header-bar">
-    <a href="index.html" class="nav-item">info</a>
-    <a href="projects.html" class="nav-item active">projects</a>
-    <a href="blog.html" class="nav-item">blog</a>
-    <a href="contact.html" class="nav-item">contact</a>
-  </header>
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>under_construction // duchess</title>
+  <title>projects // duchess</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Michroma&family=Raleway+Dots&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
   <style>
-    :root { --text-grey: rgba(160, 160, 162, 1); --bg-void: #000000; }
+    :root {
+      --text-grey: rgba(160, 160, 162, 1);
+      --bg-void: #000000;
+      --hover-color: #ffffff;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body { 
       background-color: var(--bg-void); 
       color: #fff; 
-      font-family: 'Host Grotesk', sans-serif;
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
       cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
     }
 
     /* Navigation */
     .nav-header-bar { position: absolute; top: 40px; left: 8vw; display: flex; gap: 40px; z-index: 100; }
     .nav-item { 
-      text-decoration: none; color: var(--text-grey); font-weight: 700; font-size: 24px; transition: color 0.3s;
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-weight: 700; 
+      font-size: 24px; 
+      transition: color 0.3s;
       cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
     }
+    .nav-item:hover { color: var(--hover-color); }
     .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
 
-    /* Construction Text */
-    .splash-container { position: absolute; left: 8vw; top: 35vh; }
-    .status-text { font-size: clamp(40px, 6vw, 80px); font-weight: 700; color: var(--text-grey); letter-spacing: -0.02em; }
-    .sub-text { font-family: monospace; color: var(--text-grey); margin-top: 10px; font-size: 18px; }
-	
-	/* Mobile Responsiveness for Splash Pages */
-@media (max-width: 600px) {
-  .nav-header-bar {
-    top: 25px;
-    left: 20px;
-    gap: 18px;
-  }
-  .nav-item {
-    font-size: 18px;
-  }
+    /* Page Layout */
+    .archive-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 22vh auto 12vh auto;
+      padding: 0 4vw;
+    }
 
-  .splash-container {
-    left: 20px;
-    top: 30vh;
-    padding-right: 20px;
-  }
-  .status-text {
-    font-size: 32px;
-  }
-  .sub-text {
-    font-size: 13px;
-    word-break: break-word;
-  }
-}
+    .archive-heading {
+      font-size: clamp(52px, 12vw, 90px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 0.9;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-transform: lowercase;
+    }
+
+    .archive-meta {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-grey);
+      letter-spacing: 2px;
+      margin-bottom: 50px;
+      text-transform: uppercase;
+    }
+
+    /* Grid Layout */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 32px 24px;
+      width: 100%;
+    }
+
+    .card-item {
+      position: relative;
+      background: #050505;
+      border: 1px solid #1a1a1a;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-item:hover {
+      border-color: #ffffff;
+      transform: translateY(-4px);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      aspect-ratio: 1.58 / 1; /* Standard credit/library card proportion */
+      overflow: hidden;
+      background: #111111;
+    }
+
+    .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+
+    .card-details {
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #1a1a1a;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    .card-title {
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .card-year {
+      color: var(--text-grey);
+    }
+
+    /* Fullscreen Inspection Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #000000;
+      border: 1px solid #222222;
+      max-width: 720px;
+      width: 100%;
+      padding: 30px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-image-container {
+      width: 100%;
+      aspect-ratio: 1.58 / 1;
+      background: #111;
+      border: 1px solid #1a1a1a;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .modal-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: monospace;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .modal-notes {
+      font-size: 13px;
+      color: var(--text-grey);
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      pt: 15px;
+      border-top: 1px solid #1a1a1a;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: var(--text-grey);
+      font-family: monospace;
+      padding: 10px 20px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: #ffffff;
+      color: #ffffff;
+      background: #111111;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .nav-header-bar { top: 25px; left: 20px; gap: 18px; }
+      .nav-item { font-size: 18px; }
+      .archive-container { margin-top: 120px; }
+      .cards-grid { grid-template-columns: 1fr; gap: 20px; }
+      .modal-content { padding: 20px; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Navigation -->
   <header class="nav-header-bar">
     <a href="index.html" class="nav-item">info</a>
-    <!-- Adjust class="active" depending on which file this is -->
     <a href="projects.html" class="nav-item active">projects</a>
     <a href="blog.html" class="nav-item">blog</a>
     <a href="contact.html" class="nav-item">contact</a>
   </header>
 
-  <div class="splash-container">
-    <p class="status-text">SYSTEM_BUILDING_</p>
-    <p class="sub-text">THIS_DIRECTORY_IS_CURRENTLY_UNDER_DEVELOPMENT</p>
+  <!-- Main Content Area -->
+  <main class="archive-container">
+    <h1 class="archive-heading">archive.</h1>
+    <div class="archive-meta" id="archive-counter">// LOADING_INDEX...</div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cards-grid"></div>
+  </main>
+
+  <!-- Inspection Modal -->
+  <div class="modal-overlay" id="cardModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">TITLE</div>
+        <div id="modal-year" style="color: var(--text-grey);">YEAR</div>
+      </div>
+
+      <div class="modal-image-container">
+        <img id="modal-img" src="" alt="Card Scan" />
+      </div>
+
+      <div class="modal-notes" id="modal-notes"></div>
+
+      <div class="modal-actions">
+        <button class="btn" id="flip-btn" onclick="toggleFlip()">[FLIP_CARD]</button>
+        <button class="btn" onclick="closeModal()">[CLOSE]</button>
+      </div>
+
+    </div>
   </div>
+
+  <!-- Include Generated Data Array -->
+  <script src="library-cards.js"></script>
+
+  <script>
+    let activeCard = null;
+    let showingBack = false;
+
+    // Render Grid from library-cards.js
+    function renderGrid() {
+      const grid = document.getElementById('cards-grid');
+      const counter = document.getElementById('archive-counter');
+
+      if (typeof libraryCards === 'undefined' || !libraryCards.length) {
+        counter.innerText = '// 0 ITEMS FOUND (RUN PROCESS_CARDS.PY)';
+        grid.innerHTML = '<div style="color: #666; font-family: monospace;">No card data available. Drop scans in input_scans/ and run python script.</div>';
+        return;
+      }
+
+      counter.innerText = `// ${libraryCards.length} ARCHIVAL CARDS INDEXED`;
+      grid.innerHTML = '';
+
+      libraryCards.forEach(card => {
+        const item = document.createElement('div');
+        item.className = 'card-item';
+        item.onclick = () => openModal(card);
+
+        item.innerHTML = `
+          <div class="card-img-wrapper">
+            <img src="${card.thumbFront}" alt="${card.title}" loading="lazy" />
+          </div>
+          <div class="card-details">
+            <span class="card-title">${card.title}</span>
+            <span class="card-year">${card.year}</span>
+          </div>
+        `;
+
+        grid.appendChild(item);
+      });
+    }
+
+    // Modal Operations
+    function openModal(card) {
+      activeCard = card;
+      showingBack = false;
+
+      document.getElementById('modal-title').innerText = card.title;
+      document.getElementById('modal-year').innerText = `// ${card.year}`;
+      document.getElementById('modal-notes').innerText = card.notes || 'No extended notes available for this specimen.';
+      
+      updateModalImage();
+      document.getElementById('cardModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('cardModal').classList.remove('active');
+      activeCard = null;
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'cardModal') closeModal();
+    }
+
+    function toggleFlip() {
+      if (!activeCard || !activeCard.fullBack) return;
+      showingBack = !showingBack;
+      updateModalImage();
+    }
+
+    function updateModalImage() {
+      const img = document.getElementById('modal-img');
+      const flipBtn = document.getElementById('flip-btn');
+
+      if (showingBack && activeCard.fullBack) {
+        img.src = activeCard.fullBack;
+        flipBtn.innerText = '[SHOW_FRONT]';
+      } else {
+        img.src = activeCard.fullFront;
+        flipBtn.innerText = '[FLIP_CARD]';
+      }
+
+      // Hide flip button if no back image exists
+      flipBtn.style.display = activeCard.fullBack ? 'inline-block' : 'none';
+    }
+
+    // Keyboard Shortcuts (Esc to close, Space to flip)
+    window.addEventListener('keydown', (e) => {
+      if (!activeCard) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === ' ') {
+        e.preventDefault();
+        toggleFlip();
+      }
+    });
+
+    // Navigation Accent Colors
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('mouseover', () => {
+        if (!item.classList.contains('active')) {
+          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+        }
+      });
+    });
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', renderGrid);
+  </script>
 
 </body>
 </html>
