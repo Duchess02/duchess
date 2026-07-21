@@ -40,111 +40,105 @@
     .nav-item:hover { color: var(--hover-color); }
     .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
 
-    /* Contact Form Layout */
+    /* Contact Container */
     .contact-container {
       width: 100%;
-      max-width: 540px;
-      margin: 25vh auto 10vh auto;
-      padding: 0 20px;
+      max-width: 580px;
+      margin: 22vh auto 10vh auto;
+      padding: 0 24px;
     }
 
+    /* Inquiries Header (Matches Index duchess. Title Styling) */
     .contact-heading {
-      font-size: 36px;
+      font-size: clamp(52px, 12vw, 90px);
       font-weight: 800;
-      margin-bottom: 10px;
-      letter-spacing: -1px;
-    }
-
-    .contact-sub {
-      color: var(--text-grey);
-      font-size: 15px;
-      margin-bottom: 40px;
-      line-height: 1.5;
+      letter-spacing: -3px;
+      line-height: 0.9;
+      color: #ffffff;
+      margin-bottom: 50px;
+      text-transform: lowercase;
     }
 
     .contact-form {
       display: flex;
       flex-direction: column;
-      gap: 25px;
+      gap: 36px;
     }
 
+    /* Interactive Bottom-Line Form Styling */
     .form-group {
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .form-group label {
       font-family: monospace;
       font-size: 11px;
       color: var(--text-grey);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
+      transition: color 0.3s ease;
     }
 
     .form-group input,
     .form-group textarea {
-      background: #000;
-      border: 1px solid #222;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #222;
       color: #fff;
       font-family: 'Host Grotesk', sans-serif;
-      font-size: 16px;
-      padding: 14px 16px;
+      font-size: 18px;
+      padding: 10px 0;
       outline: none;
-      transition: border-color 0.2s ease;
-      border-radius: 0; /* Square edges for brutalist aesthetic */
+      transition: border-color 0.3s ease, padding-left 0.3s ease;
+      border-radius: 0;
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
-      border-color: #fff;
+      border-bottom-color: #ffffff;
+      padding-left: 8px;
+    }
+
+    .form-group:focus-within label {
+      color: #ffffff;
     }
 
     .form-group textarea {
       resize: vertical;
-      min-height: 140px;
+      min-height: 100px;
     }
 
+    /* Submit Button */
     .submit-btn {
-      background: none;
+      background: transparent;
       border: 1px solid #333;
       color: var(--text-grey);
       font-family: monospace;
-      padding: 16px 28px;
-      font-size: 13px;
-      letter-spacing: 1px;
+      padding: 16px 32px;
+      font-size: 12px;
+      letter-spacing: 2px;
       cursor: pointer;
       align-self: flex-start;
-      transition: all 0.2s ease;
-      margin-top: 10px;
+      transition: all 0.3s ease;
+      margin-top: 15px;
     }
 
     .submit-btn:hover {
-      border-color: #fff;
-      color: #fff;
-      background: #111;
+      border-color: #ffffff;
+      color: #ffffff;
+      background: #111111;
+      transform: translateY(-2px);
     }
 
     /* Mobile Adjustments */
     @media (max-width: 600px) {
-      .nav-header-bar {
-        top: 25px;
-        left: 20px;
-        gap: 18px;
-      }
-      .nav-item {
-        font-size: 18px;
-      }
-      .contact-container {
-        margin-top: 100px;
-      }
-      .contact-heading {
-        font-size: 28px;
-      }
-      .submit-btn {
-        width: 100%;
-        text-align: center;
-      }
+      .nav-header-bar { top: 25px; left: 20px; gap: 18px; }
+      .nav-item { font-size: 18px; }
+      .contact-container { margin-top: 120px; }
+      .contact-heading { font-size: 52px; margin-bottom: 35px; }
+      .submit-btn { width: 100%; text-align: center; }
     }
   </style>
 </head>
@@ -158,38 +152,32 @@
   </header>
 
   <main class="contact-container">
-    <h1 class="contact-heading">INQUIRIES</h1>
-    <p class="contact-sub">Available for brand identity, studio consultation, and selective creative direction.</p>
+    <h1 class="contact-heading">inquiries.</h1>
 
-    <!-- FormSubmit Action -->
-   <form class="contact-form" action="https://formspree.io/f/mnjezzvk" method="POST">
-      
-      <!-- Anti-Spam Honeypot & Configuration -->
+    <form class="contact-form" action="https://formspree.io/f/mnjezzvk" method="POST">
       <input type="hidden" name="_captcha" value="false">
-      <input type="text" name="_honey" style="display:none">
       
       <div class="form-group">
-        <label for="name">// NAME OR STUDIO</label>
-        <input type="text" id="name" name="name" required placeholder="Name">
+        <label for="name">01 // NAME</label>
+        <input type="text" id="name" name="name" required placeholder="Full name or studio">
       </div>
 
       <div class="form-group">
-        <label for="email">// EMAIL ADDRESS</label>
+        <label for="email">02 // EMAIL</label>
         <input type="email" id="email" name="email" required placeholder="email@address.com">
       </div>
 
       <div class="form-group">
-        <label for="subject">// PROJECT / SUBJECT</label>
-        <input type="text" id="subject" name="_subject" placeholder="Brand Identity, Consultation, Collaboration...">
+        <label for="subject">03 // SUBJECT</label>
+        <input type="text" id="subject" name="_subject" placeholder="Project or inquiry title">
       </div>
 
       <div class="form-group">
-        <label for="message">// BRIEF / DETAILS</label>
-        <textarea id="message" name="message" required placeholder="Outline scope, timeline, budget, or ideas..."></textarea>
+        <label for="message">04 // MESSAGE</label>
+        <textarea id="message" name="message" required placeholder="Details..."></textarea>
       </div>
 
-      <button type="submit" class="submit-btn">[SEND_MESSAGE]</button>
-
+      <button type="submit" class="submit-btn">[SEND_INQUIRY]</button>
     </form>
   </main>
 
