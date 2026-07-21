@@ -294,7 +294,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Spotify Widget Updater (Replace SP_USER_ID or endpoint as needed)
+    // Spotify Widget Updater
     async function updateSpotify() {
       const SP_USER_ID = 'YOUR_DISCORD_OR_LASTFM_ID'; 
 
@@ -321,7 +321,6 @@
           artEl.style.display = 'none';
         }
       } catch (err) {
-        // Fallback or quiet catch if offline/unconfigured
         document.getElementById('spotify-status').innerText = 'STATUS // OFFLINE';
         document.getElementById('spotify-track').innerText = 'NOTHING PLAYING';
       }
