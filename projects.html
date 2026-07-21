@@ -150,7 +150,7 @@
       transform: scale(1.02);
     }
 
-    /* Embedded Archive Viewer Drawer (for Library Card Project) */
+    /* Embedded Archive Viewer Drawer */
     .archive-drawer {
       grid-column: 1 / -1;
       display: none;
@@ -215,36 +215,22 @@
           <span class="project-num">01 // ARCHIVE & EPHEMERA</span>
           <h2 class="project-title">Library Card Collection</h2>
           <span class="project-tags">SCAN ARCHIVE / TYPOGRAPHY / SPECIMEN</span>
-          <p class="project-desc">A curated digital archive of vintage physical library cards, capturing aged paper stocks, stamped issue dates, and historical typography.</p>
+          <p class="project-desc">A curated digital archive of physical library cards, capturing aged paper stocks, stamped issue dates, and historical typography.</p>
           <a href="#" class="project-link" onclick="toggleArchive(event)">[VIEW_FULL_COLLECTION]</a>
         </div>
         <div class="project-preview">
           <img src="assets/cards/thumbs/01-front.webp" alt="Library Card Archive Preview" onerror="this.src='https://via.placeholder.com/600x375/111111/A0A0A2?text=LIBRARY+CARD+ARCHIVE'">
         </div>
 
-        <!-- Embedded Drawer for 50+ Cards -->
+        <!-- Embedded Drawer for Scans -->
         <div class="archive-drawer" id="archive-drawer">
           <div style="display:flex; justify-content:space-between; font-family:monospace; font-size:12px; color:var(--text-grey);">
-            <span>// ARCHIVE INDEX (50+ SPECIMENS)</span>
+            <span>// ARCHIVE INDEX</span>
             <span style="cursor:pointer; color:#fff;" onclick="toggleArchive(event)">[CLOSE_X]</span>
           </div>
           <div class="drawer-grid" id="drawer-grid">
             <!-- Dynamically populated from library-cards.js -->
           </div>
-        </div>
-      </article>
-
-      <!-- PROJECT 02: BRAND IDENTITY / OTHER PROJECT -->
-      <article class="project-card">
-        <div class="project-meta">
-          <span class="project-num">02 // BRAND IDENTITY</span>
-          <h2 class="project-title">Studio Identity & Systems</h2>
-          <span class="project-tags">BRANDING / TYPOGRAPHY / WEB</span>
-          <p class="project-desc">Complete visual framework, custom cursors, and brutalist digital interface design for Duchess Studios.</p>
-          <a href="contact.html" class="project-link">[INQUIRE]</a>
-        </div>
-        <div class="project-preview">
-          <div style="width:100%; height:100%; background:#111; display:flex; align-items:center; justify-content:center; color:#444; font-family:monospace; font-size:12px;">// PREVIEW_ASSET</div>
         </div>
       </article>
 
