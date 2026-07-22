@@ -224,148 +224,136 @@
 
   </div>
 
-  <script>
-    let allTumblrPosts = [];
-    let currentTagFilter = 'all';
-    let currentMonthFilter = 'all';
+ <script>
+  let allTumblrPosts = [];
+  let currentTagFilter = 'all';
+  let currentMonthFilter = 'all';
 
-    async function fetchTumblrFeed() {
-      const streamEl = document.getElementById('posts-stream');
-      const archiveListEl = document.getElementById('archive-filters');
+  async function fetchTumblrFeed() {
+    const streamEl = document.getElementById('posts-stream');
+    
+    try {
+      // Using a fast public RSS-to-JSON proxy to bypass browser CORS restrictions
+      const rssUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://khizerthewzrd.tumblr.com/rss`;
+      const response = await fetch(rssUrl);
+      const data = await response.json();
       
-      try {
-        // Fetch public Tumblr JSON feed for khizerthewzrd
-        const response = await fetch('https://api.tumblr.com/v2/blog/khizerthewzrd.tumblr.com/posts?api_key=fuiQqDSy9WFkVWPwJyHyosSGwsICkKOkF7gCpOQhUrDJAIrWDL');
-        const data = await response.json();
-        
-        if (data.response && data.response.posts) {
-          allTumblrPosts = data.response.posts;
-          
-          // Generate Monthly Archives dynamically based on retrieved posts
-          generateMonthlyArchives(allTumblrPosts);
-          
-          // Render full feed initially
-          renderPosts(allTumblrPosts);
-        } else {
-          streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS FOUND</div>';
-        }
-      } catch (err) {
-        // Fallback UI mock state if offline or CORS block
-        streamEl.innerHTML = `
-          <div class="blog-post">
-            <div class="post-date">// 2026.07.22</div>
-            <div class="post-body">
-              Sample blog post loaded locally. Ensure your live Tumblr posts have tags like #music or #article attached to populate filters dynamically.
-            </div>
-            <div class="post-tags-row">
-              <a href="#" class="post-tag">#music</a>
-              <a href="#" class="post-tag">#article</a>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function renderPosts(postsToRender) {
-      const streamEl = document.getElementById('posts-stream');
-      streamEl.innerHTML = '';
-
-      if (postsToRender.length === 0) {
-        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS MATCHING CRITERIA</div>';
-        return;
-      }
-
-      postsToRender.forEach(post => {
-        const dateObj = new Date(post.date);
-        const dateFormatted = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
-        
-        // Extract tags or fallback to empty array
-        const tags = post.tags || [];
-        const tagsHtml = tags.map(t => `<button class="post-tag" onclick="filterPosts('${t.toLowerCase()}', null)">#${t}</button>`).join('');
-
-        // Get body content depending on post type (text, photo, etc.)
-        let content = post.body || post.caption || post.summary || '';
-
-        const postEl = document.createElement('article');
-        postEl.className = 'blog-post';
-        postEl.innerHTML = `
-          <div class="post-date">// ${dateFormatted}</div>
-          <div class="post-body">${content}</div>
-          <div class="post-tags-row">${tagsHtml}</div>
-        `;
-        streamEl.appendChild(postEl);
-      });
-    }
-
-    function generateMonthlyArchives(posts) {
-      const archiveListEl = document.getElementById('archive-filters');
-      const monthsSet = new Set();
-
-      posts.forEach(post => {
-        const d = new Date(post.date);
-        const monthYearKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        const monthName = d.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
-        monthsSet.add(JSON.stringify({ key: monthYearKey, label: monthName }));
-      });
-
-      // Clear existing dynamic elements except "All Months"
-      let html = `<li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>`;
-      
-      Array.from(monthsSet).forEach(item => {
-        const m = JSON.parse(item);
-        html += `<li><button class="filter-link" onclick="filterByMonth('${m.key}', this)">${m.label}</button></li>`;
-      });
-
-      archiveListEl.innerHTML = html;
-    }
-
-    function filterPosts(tag, btnElement) {
-      currentTagFilter = tag.toLowerCase().replace('#', '');
-      
-      // Update active tag UI
-      if (btnElement) {
-        document.querySelectorAll('#tag-filters .filter-link').forEach(b => b.classList.remove('active'));
-        btnElement.classList.add('active');
-      }
-
-      applyFilters();
-    }
-
-    function filterByMonth(monthKey, btnElement) {
-      currentMonthFilter = monthKey;
-
-      // Update active month UI
-      if (btnElement) {
-        document.querySelectorAll('#archive-filters .filter-link').forEach(b => b.classList.remove('active'));
-        btnElement.classList.add('active');
-      }
-
-      applyFilters();
-    }
-
-    function applyFilters() {
-      let filtered = allTumblrPosts;
-
-      // Filter by tag
-      if (currentTagFilter !== 'all') {
-        filtered = filtered.filter(p => p.tags && p.tags.some(t => t.toLowerCase() === currentTagFilter));
-      }
-
-      // Filter by month
-      if (currentMonthFilter !== 'all') {
-        filtered = filtered.filter(p => {
-          const d = new Date(p.date);
-          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-          return key === currentMonthFilter;
+      if (data.status === 'ok' && data.items && data.items.length > 0) {
+        allTumblrPosts = data.items.map(item => {
+          // rss2json returns categories as tags array
+          return {
+            title: item.title,
+            date: item.pubDate,
+            content: item.content || item.description,
+            tags: item.categories || []
+          };
         });
+        
+        generateMonthlyArchives(allTumblrPosts);
+        renderPosts(allTumblrPosts);
+      } else {
+        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS FOUND IN FEED</div>';
       }
+    } catch (err) {
+      streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// ERROR LOADING FEED</div>';
+    }
+  }
 
-      renderPosts(filtered);
+  function renderPosts(postsToRender) {
+    const streamEl = document.getElementById('posts-stream');
+    streamEl.innerHTML = '';
+
+    if (postsToRender.length === 0) {
+      streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS MATCHING CRITERIA</div>';
+      return;
     }
 
-    // Initialize Feed on Load
-    document.addEventListener('DOMContentLoaded', fetchTumblrFeed);
-  </script>
+    postsToRender.forEach(post => {
+      const dateObj = new Date(post.date);
+      const dateFormatted = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+      
+      const tagsHtml = post.tags.map(t => `<button class="post-tag" onclick="filterPosts('${t.toLowerCase()}', null)">#${t}</button>`).join('');
+
+      const postEl = document.createElement('article');
+      postEl.className = 'blog-post';
+      postEl.innerHTML = `
+        <div class="post-date">// ${dateFormatted}</div>
+        <div class="post-body">${post.content}</div>
+        <div class="post-tags-row">${tagsHtml}</div>
+      `;
+      streamEl.appendChild(postEl);
+    });
+  }
+
+  function generateMonthlyArchives(posts) {
+    const archiveListEl = document.getElementById('archive-filters');
+    const monthsSet = new Set();
+
+    posts.forEach(post => {
+      const d = new Date(post.date);
+      const monthYearKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const monthName = d.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+      monthsSet.add(JSON.stringify({ key: monthYearKey, label: monthName }));
+    });
+
+    let html = `<li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>`;
+    
+    Array.from(monthsSet).forEach(item => {
+      const m = JSON.parse(item);
+      html += `<li><button class="filter-link" onclick="filterByMonth('${m.key}', this)">${m.label}</button></li>`;
+    });
+
+    archiveListEl.innerHTML = html;
+  }
+
+  function filterPosts(tag, btnElement) {
+    currentTagFilter = tag.toLowerCase().replace('#', '');
+    if (btnElement) {
+      document.querySelectorAll('#tag-filters .filter-link').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+    }
+    applyFilters();
+  }
+
+  function filterByMonth(monthKey, btnElement) {
+    currentMonthFilter = monthKey;
+    if (btnElement) {
+      document.querySelectorAll('#archive-filters .filter-link').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+    }
+    applyFilters();
+  }
+
+  function applyFilters() {
+    let filtered = allTumblrPosts;
+
+    if (currentTagFilter !== 'all') {
+      filtered = filtered.filter(p => p.tags.some(t => t.toLowerCase() === currentTagFilter));
+    }
+
+    if (currentMonthFilter !== 'all') {
+      filtered = filtered.filter(p => {
+        const d = new Date(p.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        return key === currentMonthFilter;
+      });
+    }
+
+    renderPosts(filtered);
+  }
+
+  document.addEventListener('DOMContentLoaded', fetchTumblrFeed);
+
+  // Navigation Hover Accent Colors
+  const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('mouseover', () => {
+      if (!item.classList.contains('active')) {
+        item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
