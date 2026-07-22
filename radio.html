@@ -486,6 +486,9 @@
     }
 
     // --- 2. REAL-TIME CHAT INTEGRATION ---
+    // 24 Hours in Milliseconds for Option 3 Expiration Filter
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
     // Optional: Replace firebaseConfig with your free Firebase Realtime Database keys to enable real-time multi-user syncing
     const firebaseConfig = {
       databaseURL: "https://your-firebase-app.firebaseio.com" 
@@ -497,10 +500,18 @@
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
         
-        // Listen for new chat messages
-        db.ref("chat_messages").limitToLast(30).on("child_added", (snapshot) => {
+        // Listen for chat messages with 24-hour expiration filter
+        db.ref("chat_messages").limitToLast(100).on("child_added", (snapshot) => {
           const val = snapshot.val();
-          appendChatMessage(val.time, val.handle, val.msg);
+          const now = Date.now();
+
+          // Display message if it has no timestamp (legacy fallback) or is within 24 hours
+          if (!val.timestamp || (now - val.timestamp < TWENTY_FOUR_HOURS)) {
+            appendChatMessage(val.time, val.handle, val.msg);
+          } else {
+            // Auto-purge expired message from Firebase database
+            snapshot.ref.remove();
+          }
         });
       }
     } catch (e) {
@@ -515,12 +526,13 @@
       const handle = handleInput.value.trim() || 'guest';
       const msg = msgInput.value.trim();
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      const timestamp = Date.now();
 
       if (!msg) return;
 
       if (db) {
-        // Save to live database
-        db.ref("chat_messages").push({ handle, msg, time });
+        // Save to live database with Unix timestamp
+        db.ref("chat_messages").push({ handle, msg, time, timestamp });
       } else {
         // Fallback local display
         appendChatMessage(time, handle, msg);
