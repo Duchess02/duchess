@@ -23,6 +23,7 @@
       color: #fff; 
       font-family: 'Host Grotesk', sans-serif; 
       overflow-x: hidden;
+      min-height: 100vh;
       cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
     }
 
@@ -39,144 +40,148 @@
     .nav-item:hover { color: var(--hover-color); }
     .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
 
-    /* Feed Layout */
-    .blog-feed {
+    /* Page Layout: Blogspot 2-Column Style */
+    .blog-layout-container {
       width: 100%;
-      max-width: 540px; 
-      margin: 25vh auto 0 auto;
+      max-width: 1200px;
+      margin: 20vh auto 12vh auto;
+      padding: 0 4vw;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 60px;
+      align-items: flex-start;
+    }
+
+    /* Left Sidebar (Blogspot Archive & Tags) */
+    .blog-sidebar {
       display: flex;
       flex-direction: column;
-      gap: 80px; 
+      gap: 35px;
+      position: sticky;
+      top: 120px;
     }
 
-    .post { margin-bottom: 20px; }
-    .post img, .post video { width: 100%; height: auto; display: block; margin-bottom: 15px; border: 1px solid #222; }
-    .post-text { color: var(--text-grey); font-size: 15px; line-height: 1.5; margin-bottom: 10px; }
-    .post-text a { color: #fff; text-decoration: underline; }
-    .post-date { font-family: monospace; font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-
-    /* Quote Post Style */
-    .post blockquote { border-left: 2px solid #fff; padding-left: 15px; font-size: 22px; font-style: italic; margin-bottom: 15px; color: #fff; }
-
-    /* Photoset Grid */
-    .photoset-grid { display: flex; flex-direction: column; gap: 15px; }
-
-    /* Load More Button Container */
-    .pagination-container {
-      text-align: center;
-      margin: 60px 0 120px 0;
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .load-more-btn {
-      background: none;
-      border: 1px solid #333;
-      color: var(--text-grey);
+
+    .sidebar-title {
       font-family: monospace;
-      padding: 14px 28px;
-      font-size: 13px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      display: none;
-      transition: all 0.2s ease;
-    }
-    .load-more-btn:hover {
-      border-color: #fff;
-      color: #fff;
-      background: #111;
-    }
-
-    /* Back to Top Button */
-    .back-to-top-btn {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      background: #000;
-      border: 1px solid #333;
+      font-size: 11px;
       color: var(--text-grey);
-      font-family: monospace;
-      padding: 10px 16px;
-      font-size: 12px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 900;
-    }
-    .back-to-top-btn.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .back-to-top-btn:hover {
-      border-color: #fff;
-      color: #fff;
-      background: #111;
-    }
-
-    /* Modal / Popup */
-    .modal-overlay {
-      display: none; 
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.92); z-index: 1000;
-      justify-content: center; align-items: center;
-      backdrop-filter: blur(8px);
-    }
-    .modal-content {
-      background: #111; border: 1px solid #333;
-      width: 90%; max-width: 800px; max-height: 85vh;
-      padding: 40px; overflow-y: auto; position: relative;
-    }
-    .close-btn {
-      position: absolute; top: 20px; right: 20px; color: #fff;
-      background: none; border: none; font-size: 18px; font-family: monospace;
-      cursor: pointer;
-    }
-    .close-btn:hover { color: var(--text-grey); }
-
-    .loading-indicator {
-      font-family: monospace;
-      color: var(--text-grey);
-      text-align: center;
-      font-size: 14px;
       letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 6px;
     }
-	
-	/* Mobile Adjustments */
-@media (max-width: 600px) {
-  /* Tighten navigation so links stay on one row */
-  .nav-header-bar {
-    top: 25px;
-    left: 20px;
-    gap: 20px;
-  }
-  .nav-item {
-    font-size: 18px;
-  }
 
-  /* Reduce huge top gap and add side padding so posts don't hit screen edges */
-  .blog-feed {
-    margin-top: 90px;
-    padding: 0 20px;
-    gap: 50px;
-  }
+    .sidebar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+    }
 
-  /* Maximize image real estate inside the popup modal */
-  .modal-content {
-    padding: 25px 15px 20px 15px;
-    width: 95%;
-  }
+    .filter-link {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-grey);
+      text-decoration: none;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
 
-  /* Tuck the Back to Top button closer to the corner */
-  .back-to-top-btn {
-    bottom: 20px;
-    right: 20px;
-    padding: 8px 12px;
-    font-size: 11px;
-  }
-}
+    .filter-link:hover, .filter-link.active {
+      color: #ffffff;
+    }
+
+    /* Right Column: Main Posts Stream */
+    .posts-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .blog-post {
+      border-top: 1px solid #1a1a1a;
+      padding-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .post-date {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-grey);
+      letter-spacing: 1.5px;
+    }
+
+    .post-body {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #dfdfdf;
+    }
+
+    .post-body img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 15px 0;
+      border: 1px solid #222;
+    }
+
+    .post-tags-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .post-tag {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-grey);
+      background: #080808;
+      border: 1px solid #1f1f1f;
+      padding: 3px 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .post-tag:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 850px) {
+      .nav-header-bar { top: 25px; left: 20px; gap: 18px; }
+      .nav-item { font-size: 18px; }
+      .blog-layout-container {
+        margin-top: 120px;
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .blog-sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Navigation -->
   <header class="nav-header-bar">
     <a href="index.html" class="nav-item">info</a>
     <a href="projects.html" class="nav-item">projects</a>
@@ -184,196 +189,182 @@
     <a href="contact.html" class="nav-item">contact</a>
   </header>
 
-  <!-- Feed Container -->
-  <div class="blog-feed" id="blog-feed">
-    <div class="loading-indicator" id="loading">CONNECTING_TO_FEED...</div>
-  </div>
+  <!-- Main Layout -->
+  <div class="blog-layout-container">
+    
+    <!-- Left Sidebar: Filters -->
+    <aside class="blog-sidebar">
+      
+      <!-- Topics / Tags Filter -->
+      <div class="sidebar-section">
+        <div class="sidebar-title">// TOPICS</div>
+        <ul class="sidebar-list" id="tag-filters">
+          <li><button class="filter-link active" onclick="filterPosts('all', this)">// ALL POSTS</button></li>
+          <li><button class="filter-link" onclick="filterPosts('music', this)">#music</button></li>
+          <li><button class="filter-link" onclick="filterPosts('article', this)">#article</button></li>
+          <li><button class="filter-link" onclick="filterPosts('event', this)">#event</button></li>
+        </ul>
+      </div>
 
-  <!-- Pagination Button -->
-  <div class="pagination-container">
-    <button class="load-more-btn" id="load-more-btn" onclick="fetchTumblrPosts(true)">[LOAD_MORE_POSTS]</button>
-  </div>
+      <!-- Monthly Archives Filter -->
+      <div class="sidebar-section">
+        <div class="sidebar-title">// ARCHIVE</div>
+        <ul class="sidebar-list" id="archive-filters">
+          <li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>
+          <!-- Dynamically populated monthly buckets -->
+        </ul>
+      </div>
 
-  <!-- Back to Top Button -->
-  <button class="back-to-top-btn" id="back-to-top-btn" onclick="scrollToTop()">[↑ TOP]</button>
+    </aside>
 
-  <!-- Image Expansion Modal -->
-  <div class="modal-overlay" id="postModal">
-    <div class="modal-content" id="modal-body">
-      <button class="close-btn" onclick="closeModal()">[X] CLOSE</button>
-      <div id="modal-inner-content"></div>
-    </div>
+    <!-- Right Stream: Posts -->
+    <main class="posts-stream" id="posts-stream">
+      <div style="font-family: monospace; color: var(--text-grey);">// FETCHING_TUMBLR_FEED...</div>
+    </main>
+
   </div>
 
   <script>
-    // Configuration
-    const TUMBLR_BLOG = 'khizerthewzrd';
-    const TUMBLR_API_KEY = 'EBZIUGqAdhDfniX8RS76WRSWbJF0xruhD27BDx9RTVEg5L4Z14';
+    let allTumblrPosts = [];
+    let currentTagFilter = 'all';
+    let currentMonthFilter = 'all';
 
-    let currentOffset = 0;
-    const POSTS_PER_PAGE = 20;
-
-    // 1. Navigation Hover Accent Colors
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('mouseover', () => {
-        if (!item.classList.contains('active')) {
-          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
-        }
-      });
-    });
-
-    // 2. Fetch Posts with Offset Support
-    async function fetchTumblrPosts(isLoadMore = false) {
-      const feedContainer = document.getElementById('blog-feed');
-      const loadMoreBtn = document.getElementById('load-more-btn');
-
-      if (isLoadMore && loadMoreBtn) {
-        loadMoreBtn.innerText = '[LOADING...]';
-        loadMoreBtn.disabled = true;
-      }
-
-      const url = `https://api.tumblr.com/v2/blog/${TUMBLR_BLOG}.tumblr.com/posts?api_key=${TUMBLR_API_KEY}&reblog_fields=none&offset=${currentOffset}&limit=${POSTS_PER_PAGE}`;
-
+    async function fetchTumblrFeed() {
+      const streamEl = document.getElementById('posts-stream');
+      const archiveListEl = document.getElementById('archive-filters');
+      
       try {
-        const response = await fetch(url);
+        // Fetch public Tumblr JSON feed for khizerthewzrd
+        const response = await fetch('https://api.tumblr.com/v2/blog/khizerthewzrd.tumblr.com/posts?api_key=fuiQqDSy9WFkVWPwJyHyosSGwsICkKOkF7gCpOQhUrDJAIrWDL');
         const data = await response.json();
-
-        if (data.meta && data.meta.status === 200) {
-          const posts = data.response.posts;
-          const totalPosts = data.response.total_posts;
-
-          if (!isLoadMore) {
-            feedContainer.innerHTML = '';
-          }
-
-          if (posts.length === 0 && !isLoadMore) {
-            feedContainer.innerHTML = '<div class="loading-indicator">NO_POSTS_PUBLISHED_YET</div>';
-            return;
-          }
-
-          posts.forEach(post => {
-            const postElement = createPostHTML(post);
-            feedContainer.appendChild(postElement);
-          });
-
-          currentOffset += posts.length;
-
-          // Toggle Load More button based on remaining total posts
-          if (loadMoreBtn) {
-            if (currentOffset < totalPosts) {
-              loadMoreBtn.style.display = 'inline-block';
-              loadMoreBtn.innerText = '[LOAD_MORE_POSTS]';
-              loadMoreBtn.disabled = false;
-            } else {
-              loadMoreBtn.style.display = 'none';
-            }
-          }
+        
+        if (data.response && data.response.posts) {
+          allTumblrPosts = data.response.posts;
+          
+          // Generate Monthly Archives dynamically based on retrieved posts
+          generateMonthlyArchives(allTumblrPosts);
+          
+          // Render full feed initially
+          renderPosts(allTumblrPosts);
         } else {
-          if (!isLoadMore) feedContainer.innerHTML = `<div class="loading-indicator">API_ERROR: // ${data.meta.msg.toUpperCase()}</div>`;
+          streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS FOUND</div>';
         }
       } catch (err) {
-        console.error("Tumblr Fetch Error:", err);
-        if (!isLoadMore) feedContainer.innerHTML = '<div class="loading-indicator">STATUS: // FEED_OFFLINE</div>';
+        // Fallback UI mock state if offline or CORS block
+        streamEl.innerHTML = `
+          <div class="blog-post">
+            <div class="post-date">// 2026.07.22</div>
+            <div class="post-body">
+              Sample blog post loaded locally. Ensure your live Tumblr posts have tags like #music or #article attached to populate filters dynamically.
+            </div>
+            <div class="post-tags-row">
+              <a href="#" class="post-tag">#music</a>
+              <a href="#" class="post-tag">#article</a>
+            </div>
+          </div>
+        `;
       }
     }
 
-    // 3. Post Rendering Logic
-    function createPostHTML(post) {
-      const article = document.createElement('article');
-      article.className = 'post';
+    function renderPosts(postsToRender) {
+      const streamEl = document.getElementById('posts-stream');
+      streamEl.innerHTML = '';
 
-      const postDate = new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toLowerCase();
-      let contentHTML = '';
-
-      if (post.type === 'photo') {
-        if (post.photos && post.photos.length > 1) {
-          contentHTML += '<div class="photoset-grid">';
-          post.photos.forEach(p => {
-            contentHTML += `<img src="${p.alt_sizes[0].url}" alt="Post image" onclick="openModalWithImages('${encodeURIComponent(JSON.stringify(post.photos))}', '${encodeURIComponent(post.caption || '')}')" style="cursor:pointer;" />`;
-          });
-          contentHTML += '</div>';
-        } else if (post.photos && post.photos.length === 1) {
-          const mainImg = post.photos[0].alt_sizes[0].url;
-          contentHTML += `<img src="${mainImg}" alt="Post image" onclick="openModalWithImage('${mainImg}', '${encodeURIComponent(post.caption || '')}')" style="cursor:pointer;" />`;
-        }
-        if (post.caption) contentHTML += `<div class="post-text">${post.caption}</div>`;
-      } 
-      else if (post.type === 'text') {
-        if (post.title) contentHTML += `<h3 style="font-size:22px; font-weight:700; margin-bottom:10px;">${post.title}</h3>`;
-        contentHTML += `<div class="post-text">${post.body}</div>`;
-      } 
-      else if (post.type === 'quote') {
-        contentHTML += `<blockquote>"${post.text}"</blockquote>`;
-        if (post.source) contentHTML += `<div class="post-text">— ${post.source}</div>`;
-      } 
-      else if (post.type === 'audio') {
-        if (post.player) contentHTML += `<div style="margin-bottom:15px;">${post.player}</div>`;
-        if (post.caption) contentHTML += `<div class="post-text">${post.caption}</div>`;
-      }
-      else if (post.type === 'video') {
-        if (post.player && post.player[0]) contentHTML += `<div style="margin-bottom:15px;">${post.player[post.player.length - 1].embed_code}</div>`;
-        if (post.caption) contentHTML += `<div class="post-text">${post.caption}</div>`;
-      }
-      else if (post.type === 'link') {
-        contentHTML += `<div class="post-text"><a href="${post.url}" target="_blank" style="font-size:18px; font-weight:700;">${post.title || post.url} →</a></div>`;
-        if (post.description) contentHTML += `<div class="post-text">${post.description}</div>`;
+      if (postsToRender.length === 0) {
+        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS MATCHING CRITERIA</div>';
+        return;
       }
 
-      contentHTML += `<p class="post-date">${postDate}</p>`;
-      article.innerHTML = contentHTML;
-      return article;
+      postsToRender.forEach(post => {
+        const dateObj = new Date(post.date);
+        const dateFormatted = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+        
+        // Extract tags or fallback to empty array
+        const tags = post.tags || [];
+        const tagsHtml = tags.map(t => `<button class="post-tag" onclick="filterPosts('${t.toLowerCase()}', null)">#${t}</button>`).join('');
+
+        // Get body content depending on post type (text, photo, etc.)
+        let content = post.body || post.caption || post.summary || '';
+
+        const postEl = document.createElement('article');
+        postEl.className = 'blog-post';
+        postEl.innerHTML = `
+          <div class="post-date">// ${dateFormatted}</div>
+          <div class="post-body">${content}</div>
+          <div class="post-tags-row">${tagsHtml}</div>
+        `;
+        streamEl.appendChild(postEl);
+      });
     }
 
-    // 4. Modal Functions
-    function openModalWithImage(imgUrl, caption) {
-      const container = document.getElementById('modal-inner-content');
-      const decodedCaption = decodeURIComponent(caption);
-      container.innerHTML = `
-        <img src="${imgUrl}" style="width:100%; margin-bottom:20px; border:1px solid #333;" />
-        <div class="post-text" style="color:#fff;">${decodedCaption}</div>
-      `;
-      document.getElementById('postModal').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
+    function generateMonthlyArchives(posts) {
+      const archiveListEl = document.getElementById('archive-filters');
+      const monthsSet = new Set();
 
-    function openModalWithImages(photosJSON, caption) {
-      const photos = JSON.parse(decodeURIComponent(photosJSON));
-      const decodedCaption = decodeURIComponent(caption);
-      const container = document.getElementById('modal-inner-content');
+      posts.forEach(post => {
+        const d = new Date(post.date);
+        const monthYearKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const monthName = d.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+        monthsSet.add(JSON.stringify({ key: monthYearKey, label: monthName }));
+      });
+
+      // Clear existing dynamic elements except "All Months"
+      let html = `<li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>`;
       
-      let imgsHTML = photos.map(p => `<img src="${p.alt_sizes[0].url}" style="width:100%; margin-bottom:20px; border:1px solid #333;" />`).join('');
-      container.innerHTML = imgsHTML + `<div class="post-text" style="color:#fff;">${decodedCaption}</div>`;
+      Array.from(monthsSet).forEach(item => {
+        const m = JSON.parse(item);
+        html += `<li><button class="filter-link" onclick="filterByMonth('${m.key}', this)">${m.label}</button></li>`;
+      });
+
+      archiveListEl.innerHTML = html;
+    }
+
+    function filterPosts(tag, btnElement) {
+      currentTagFilter = tag.toLowerCase().replace('#', '');
       
-      document.getElementById('postModal').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      document.getElementById('postModal').style.display = 'none';
-      document.body.style.overflow = 'auto';
-    }
-
-    document.getElementById('postModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-
-    // 5. Scroll to Top Behavior & Visibility Toggle
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    const topBtn = document.getElementById('back-to-top-btn');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
-        topBtn.classList.add('visible');
-      } else {
-        topBtn.classList.remove('visible');
+      // Update active tag UI
+      if (btnElement) {
+        document.querySelectorAll('#tag-filters .filter-link').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
       }
-    });
 
-    // Initial Fetch
-    fetchTumblrPosts();
+      applyFilters();
+    }
+
+    function filterByMonth(monthKey, btnElement) {
+      currentMonthFilter = monthKey;
+
+      // Update active month UI
+      if (btnElement) {
+        document.querySelectorAll('#archive-filters .filter-link').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let filtered = allTumblrPosts;
+
+      // Filter by tag
+      if (currentTagFilter !== 'all') {
+        filtered = filtered.filter(p => p.tags && p.tags.some(t => t.toLowerCase() === currentTagFilter));
+      }
+
+      // Filter by month
+      if (currentMonthFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          const d = new Date(p.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          return key === currentMonthFilter;
+        });
+      }
+
+      renderPosts(filtered);
+    }
+
+    // Initialize Feed on Load
+    document.addEventListener('DOMContentLoaded', fetchTumblrFeed);
   </script>
 
 </body>
