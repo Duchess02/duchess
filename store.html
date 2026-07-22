@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>store // duchess</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Firebase Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --text-grey: rgba(160, 160, 162, 1);
+      --bg-void: #000000;
+      --hover-color: #ffffff;
+      --signal-red: #ff3333;
+      --signal-green: #33ff77;
+      --signal-yellow: #ffaa33;
+      --border-dark: #1a1a1a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: #fff; 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation */
+    .nav-header-bar { position: absolute; top: 40px; left: 8vw; display: flex; gap: 40px; z-index: 100; }
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-weight: 700; 
+      font-size: 24px; 
+      transition: color 0.3s;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    .nav-item:hover { color: var(--hover-color); }
+    .nav-item.active { color: #FFFFFF !important; pointer-events: none; }
+
+    /* Main Container */
+    .store-container {
+      position: absolute;
+      top: 22vh;
+      left: 8vw;
+      width: clamp(320px, 84vw, 720px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .text-17 {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-grey);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* Store Terminal Console Frame */
+    .store-console {
+      border: 1px solid var(--border-dark);
+      background: #050505;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-grey);
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid #141414;
+      padding-bottom: 14px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--signal-yellow);
+      box-shadow: 0 0 8px var(--signal-yellow);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    .store-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .store-title {
+      font-family: monospace;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .store-description {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-grey);
+      max-width: 540px;
+    }
+
+    /* Waitlist Form Bar */
+    .waitlist-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      border-top: 1px solid #141414;
+      padding-top: 24px;
+    }
+
+    .waitlist-input {
+      background: #0a0a0a;
+      border: 1px solid #222;
+      color: #fff;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 12px 14px;
+      flex: 1;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .waitlist-input:focus {
+      border-color: #555;
+    }
+
+    .submit-btn {
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      font-family: monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .submit-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    #form-status {
+      font-family: monospace;
+      font-size: 11px;
+      margin-top: 10px;
+      letter-spacing: 1px;
+      display: none;
+    }
+
+    /* Mobile Responsive Stack */
+    @media (max-width: 900px) {
+      .nav-header-bar { top: 25px; left: 20px; gap: 14px; }
+      .nav-item { font-size: 18px; }
+      .store-container { left: 5vw; width: 90vw; top: 14vh; }
+      .waitlist-form { flex-direction: column; }
+      .submit-btn { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item">info</a>
+    <a href="projects.html" class="nav-item">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="radio.html" class="nav-item">radio</a>
+    <a href="store.html" class="nav-item active">store</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+
+  <!-- Store Landing Container -->
+  <div class="store-container">
+    <div class="text-17">physical // supply vault</div>
+
+    <div class="store-console">
+      <div class="console-header">
+        <span>// INVENTORY SYSTEM v1.0</span>
+        <div class="status-badge">
+          <div class="pulse-dot"></div>
+          <span style="color: var(--signal-yellow);">STOCK LOADING</span>
+        </div>
+      </div>
+
+      <div class="store-body">
+        <div class="store-title">[ PHYSICAL CATALOG IN INITIALIZATION ]</div>
+        <p class="store-description">
+          Limited physical objects, collaborations, ceramics, and apparel currently in production. 
+          Enter your signal address below to receive notification the second the shop populates.
+        </p>
+
+        <form class="waitlist-form" onsubmit="handleWaitlist(event)">
+          <input 
+            type="email" 
+            id="user-email" 
+            class="waitlist-input" 
+            placeholder="enter your email address..." 
+            required 
+            autocomplete="off"
+          >
+          <button type="submit" class="submit-btn">JOIN WAITLIST</button>
+        </form>
+
+        <div id="form-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- FIREBASE REALTIME DATABASE CONFIG ---
+    // Update databaseURL with your active Firebase project URL
+    const firebaseConfig = {
+      databaseURL: "https://your-firebase-app.firebaseio.com" 
+    };
+
+    let db = null;
+    try {
+      if (firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("your-firebase-app")) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+      }
+    } catch (e) {
+      console.log("Store running in local preview mode.");
+    }
+
+    function handleWaitlist(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('user-email');
+      const statusMsg = document.getElementById('form-status');
+      const email = emailInput.value.trim();
+
+      if (!email) return;
+
+      if (db) {
+        db.ref("store_waitlist").push({
+          email: email,
+          timestamp: Date.now(),
+          date: new Date().toISOString()
+        }).then(() => {
+          showStatus("// SIGNAL ACKNOWLEDGED. YOU ARE ON THE LIST.", "#33ff77");
+          emailInput.value = '';
+        }).catch(err => {
+          showStatus("// TRANSMISSION ERROR. TRY AGAIN.", "#ff3333");
+        });
+      } else {
+        // Fallback preview notification
+        showStatus("// PREVIEW MODE: EMAIL RECORDED LOCALLY.", "#ffaa33");
+        emailInput.value = '';
+      }
+    }
+
+    function showStatus(message, color) {
+      const statusMsg = document.getElementById('form-status');
+      statusMsg.innerText = message;
+      statusMsg.style.color = color;
+      statusMsg.style.display = 'block';
+    }
+
+    // Navigation Hover Accent Colors
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('mouseover', () => {
+        if (!item.classList.contains('active')) {
+          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
