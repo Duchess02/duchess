@@ -82,6 +82,8 @@
       flex-direction: column;
       gap: 8px;
       list-style: none;
+      max-height: 40vh;
+      overflow-y: auto;
     }
 
     .filter-link {
@@ -154,11 +156,42 @@
       padding: 3px 8px;
       text-decoration: none;
       transition: all 0.2s;
+      cursor: pointer;
     }
 
     .post-tag:hover {
       border-color: #fff;
       color: #fff;
+    }
+
+    /* Scroll to Top Button */
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background: #050505;
+      border: 1px solid #222;
+      color: var(--text-grey);
+      font-family: monospace;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      padding: 10px 16px;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .scroll-top-btn.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top-btn:hover {
+      border-color: #fff;
+      color: #fff;
+      background: #111;
     }
 
     /* Mobile Responsiveness */
@@ -176,6 +209,7 @@
         flex-wrap: wrap;
         gap: 30px;
       }
+      .scroll-top-btn { bottom: 20px; right: 20px; }
     }
   </style>
 </head>
@@ -211,7 +245,6 @@
         <div class="sidebar-title">// ARCHIVE</div>
         <ul class="sidebar-list" id="archive-filters">
           <li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>
-          <!-- Dynamically populated monthly buckets -->
         </ul>
       </div>
 
@@ -224,136 +257,151 @@
 
   </div>
 
- <script>
-  let allTumblrPosts = [];
-  let currentTagFilter = 'all';
-  let currentMonthFilter = 'all';
+  <!-- Scroll to Top Button -->
+  <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">[TOP]</button>
 
-  async function fetchTumblrFeed() {
-    const streamEl = document.getElementById('posts-stream');
-    
-    try {
-      // Using a fast public RSS-to-JSON proxy to bypass browser CORS restrictions
-      const rssUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://khizerthewzrd.tumblr.com/rss`;
-      const response = await fetch(rssUrl);
-      const data = await response.json();
+  <script>
+    let allTumblrPosts = [];
+    let currentTagFilter = 'all';
+    let currentMonthFilter = 'all';
+
+    async function fetchTumblrFeed() {
+      const streamEl = document.getElementById('posts-stream');
       
-      if (data.status === 'ok' && data.items && data.items.length > 0) {
-        allTumblrPosts = data.items.map(item => {
-          // rss2json returns categories as tags array
-          return {
-            title: item.title,
-            date: item.pubDate,
-            content: item.content || item.description,
-            tags: item.categories || []
-          };
-        });
+      try {
+        const rssUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://khizerthewzrd.tumblr.com/rss`;
+        const response = await fetch(rssUrl);
+        const data = await response.json();
         
-        generateMonthlyArchives(allTumblrPosts);
-        renderPosts(allTumblrPosts);
-      } else {
-        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS FOUND IN FEED</div>';
+        if (data.status === 'ok' && data.items && data.items.length > 0) {
+          allTumblrPosts = data.items.map(item => {
+            return {
+              title: item.title,
+              date: item.pubDate,
+              content: item.content || item.description,
+              tags: item.categories || []
+            };
+          });
+          
+          generateMonthlyArchives(allTumblrPosts);
+          renderPosts(allTumblrPosts);
+        } else {
+          streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS FOUND IN FEED</div>';
+        }
+      } catch (err) {
+        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// ERROR LOADING FEED</div>';
       }
-    } catch (err) {
-      streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// ERROR LOADING FEED</div>';
-    }
-  }
-
-  function renderPosts(postsToRender) {
-    const streamEl = document.getElementById('posts-stream');
-    streamEl.innerHTML = '';
-
-    if (postsToRender.length === 0) {
-      streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS MATCHING CRITERIA</div>';
-      return;
     }
 
-    postsToRender.forEach(post => {
-      const dateObj = new Date(post.date);
-      const dateFormatted = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
-      
-      const tagsHtml = post.tags.map(t => `<button class="post-tag" onclick="filterPosts('${t.toLowerCase()}', null)">#${t}</button>`).join('');
+    function renderPosts(postsToRender) {
+      const streamEl = document.getElementById('posts-stream');
+      streamEl.innerHTML = '';
 
-      const postEl = document.createElement('article');
-      postEl.className = 'blog-post';
-      postEl.innerHTML = `
-        <div class="post-date">// ${dateFormatted}</div>
-        <div class="post-body">${post.content}</div>
-        <div class="post-tags-row">${tagsHtml}</div>
-      `;
-      streamEl.appendChild(postEl);
-    });
-  }
+      if (postsToRender.length === 0) {
+        streamEl.innerHTML = '<div style="font-family: monospace; color: var(--text-grey);">// NO POSTS MATCHING CRITERIA</div>';
+        return;
+      }
 
-  function generateMonthlyArchives(posts) {
-    const archiveListEl = document.getElementById('archive-filters');
-    const monthsSet = new Set();
+      postsToRender.forEach(post => {
+        const dateObj = new Date(post.date);
+        const dateFormatted = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
+        
+        const tagsHtml = post.tags.map(t => `<button class="post-tag" onclick="filterPosts('${t.toLowerCase()}', null)">#${t}</button>`).join('');
 
-    posts.forEach(post => {
-      const d = new Date(post.date);
-      const monthYearKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const monthName = d.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
-      monthsSet.add(JSON.stringify({ key: monthYearKey, label: monthName }));
-    });
-
-    let html = `<li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>`;
-    
-    Array.from(monthsSet).forEach(item => {
-      const m = JSON.parse(item);
-      html += `<li><button class="filter-link" onclick="filterByMonth('${m.key}', this)">${m.label}</button></li>`;
-    });
-
-    archiveListEl.innerHTML = html;
-  }
-
-  function filterPosts(tag, btnElement) {
-    currentTagFilter = tag.toLowerCase().replace('#', '');
-    if (btnElement) {
-      document.querySelectorAll('#tag-filters .filter-link').forEach(b => b.classList.remove('active'));
-      btnElement.classList.add('active');
-    }
-    applyFilters();
-  }
-
-  function filterByMonth(monthKey, btnElement) {
-    currentMonthFilter = monthKey;
-    if (btnElement) {
-      document.querySelectorAll('#archive-filters .filter-link').forEach(b => b.classList.remove('active'));
-      btnElement.classList.add('active');
-    }
-    applyFilters();
-  }
-
-  function applyFilters() {
-    let filtered = allTumblrPosts;
-
-    if (currentTagFilter !== 'all') {
-      filtered = filtered.filter(p => p.tags.some(t => t.toLowerCase() === currentTagFilter));
-    }
-
-    if (currentMonthFilter !== 'all') {
-      filtered = filtered.filter(p => {
-        const d = new Date(p.date);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        return key === currentMonthFilter;
+        const postEl = document.createElement('article');
+        postEl.className = 'blog-post';
+        postEl.innerHTML = `
+          <div class="post-date">// ${dateFormatted}</div>
+          <div class="post-body">${post.content}</div>
+          <div class="post-tags-row">${tagsHtml}</div>
+        `;
+        streamEl.appendChild(postEl);
       });
     }
 
-    renderPosts(filtered);
-  }
+    function generateMonthlyArchives(posts) {
+      const archiveListEl = document.getElementById('archive-filters');
+      const monthsSet = new Set();
 
-  document.addEventListener('DOMContentLoaded', fetchTumblrFeed);
+      posts.forEach(post => {
+        const d = new Date(post.date);
+        const monthYearKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const monthName = d.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+        monthsSet.add(JSON.stringify({ key: monthYearKey, label: monthName }));
+      });
 
-  // Navigation Hover Accent Colors
-  const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('mouseover', () => {
-      if (!item.classList.contains('active')) {
-        item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+      let html = `<li><button class="filter-link active" onclick="filterByMonth('all', this)">// ALL MONTHS</button></li>`;
+      
+      Array.from(monthsSet).forEach(item => {
+        const m = JSON.parse(item);
+        html += `<li><button class="filter-link" onclick="filterByMonth('${m.key}', this)">${m.label}</button></li>`;
+      });
+
+      archiveListEl.innerHTML = html;
+    }
+
+    function filterPosts(tag, btnElement) {
+      currentTagFilter = tag.toLowerCase().replace('#', '');
+      if (btnElement) {
+        document.querySelectorAll('#tag-filters .filter-link').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      applyFilters();
+    }
+
+    function filterByMonth(monthKey, btnElement) {
+      currentMonthFilter = monthKey;
+      if (btnElement) {
+        document.querySelectorAll('#archive-filters .filter-link').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let filtered = allTumblrPosts;
+
+      if (currentTagFilter !== 'all') {
+        filtered = filtered.filter(p => p.tags.some(t => t.toLowerCase() === currentTagFilter));
+      }
+
+      if (currentMonthFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          const d = new Date(p.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          return key === currentMonthFilter;
+        });
+      }
+
+      renderPosts(filtered);
+    }
+
+    // Scroll to Top Logic
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
       }
     });
-  });
-</script>
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchTumblrFeed);
+
+    // Navigation Hover Accent Colors
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#00FFFF'];
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('mouseover', () => {
+        if (!item.classList.contains('active')) {
+          item.style.setProperty('--hover-color', colors[Math.floor(Math.random() * colors.length)]);
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
