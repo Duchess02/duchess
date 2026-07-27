@@ -207,8 +207,8 @@
           card.className = 'article-card';
           
           let imageUrl = article.imageUrl || "article-01.jpg";
-          if (!imageUrl.startsWith('http') && !imageUrl.startsWith('images/')) {
-            imageUrl = `images/${imageUrl}`;
+          if (!imageUrl.startsWith('http') && !imageUrl.startsWith('assets/images/')) {
+            imageUrl = `assets/images/${imageUrl}`;
           }
           
           card.innerHTML = `
