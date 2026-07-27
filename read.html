@@ -206,7 +206,10 @@
           card.href = `article.html?id=${articleId}`;
           card.className = 'article-card';
           
-          const imageUrl = article.imageUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop";
+          let imageUrl = article.imageUrl || "article-01.jpg";
+          if (!imageUrl.startsWith('http') && !imageUrl.startsWith('images/')) {
+            imageUrl = `images/${imageUrl}`;
+          }
           
           card.innerHTML = `
             <img src="${escapeHtml(imageUrl)}" alt="" class="card-thumb">
