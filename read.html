@@ -19,7 +19,7 @@
       --bg-void: #000000;
       --text-main: #ffffff;
       --text-muted: #666666;
-      --text-body: #cccccc;
+      --text-body: #999999;
       --accent: #a0a0a2;
     }
 
@@ -54,193 +54,98 @@
     }
     
     .nav-item:hover { color: var(--text-main); }
+    .nav-item.active { color: var(--text-main) !important; pointer-events: none; }
 
-    /* Article Container */
-    .article-wrapper {
-      max-width: 680px;
-      margin: 22vh auto 10vh auto;
-      padding: 0 4vw;
+    /* Directory Layout */
+    .directory-wrapper {
+      position: absolute;
+      top: 22vh;
+      left: 8vw;
+      width: clamp(320px, 84vw, 900px);
       display: flex;
       flex-direction: column;
-      gap: 40px;
+      gap: 48px;
+      padding-bottom: 10vh;
     }
 
-    /* Header & Meta */
-    .article-header {
+    /* Article Cards Grid/List */
+    .article-stream {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 48px;
     }
 
-    .article-title {
-      font-family: 'Host Grotesk', sans-serif;
-      font-weight: 300;
-      font-size: clamp(36px, 5vw, 56px);
-      line-height: 1.05;
-      letter-spacing: -1px;
-    }
-
-    .article-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      border-bottom: 1px solid #222;
-      padding-bottom: 16px;
-    }
-
-    /* Article Body */
-    .article-content {
-      font-family: 'Inter', sans-serif;
-      font-weight: 300;
-      font-size: 15px;
-      line-height: 1.8;
-      color: var(--text-body);
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .article-content p {
-      text-align: justify;
-    }
-
-    /* Engagement Bar */
-    .engagement-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #222;
-      border-bottom: 1px solid #222;
-      padding: 16px 0;
-      margin-top: 20px;
-    }
-
-    .like-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: color 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .like-btn:hover { color: var(--text-main); }
-    .like-btn.liked { color: #fff; pointer-events: none; }
-
-    /* Comment Section */
-    .comments-section {
-      display: flex;
-      flex-direction: column;
+    .article-card {
+      display: grid;
+      grid-template-columns: 240px 1fr;
       gap: 32px;
-      margin-top: 20px;
+      text-decoration: none;
+      border-bottom: 1px solid #111;
+      padding-bottom: 48px;
+      transition: opacity 0.3s ease;
     }
 
-    .comments-header {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      text-transform: uppercase;
+    .article-card:hover {
+      opacity: 0.8;
     }
 
-    .comment-list {
+    .card-thumb {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background-color: #111;
+    }
+
+    .card-body {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 12px;
     }
 
-    .comment-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .comment-meta {
+    .card-meta {
       font-family: 'Inter', sans-serif;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--text-muted);
+      letter-spacing: 2px;
+      color: var(--accent);
       text-transform: uppercase;
+      display: flex;
+      gap: 12px;
     }
 
-    .comment-text {
+    .card-title {
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 300;
+      font-size: clamp(22px, 2.5vw, 28px);
+      line-height: 1.15;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .card-blurb {
       font-family: 'Inter', sans-serif;
       font-weight: 300;
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.6;
       color: var(--text-body);
     }
 
-    .comment-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 16px;
-    }
-
-    .comment-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #333;
-      color: var(--text-main);
+    .empty-state {
       font-family: 'Inter', sans-serif;
       font-size: 12px;
-      padding: 12px 0;
-      outline: none;
-      transition: border-color 0.4s ease;
-      width: 100%;
-    }
-
-    .comment-input::placeholder {
-      color: #444;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .comment-input:focus { border-bottom-color: var(--text-main); }
-
-    .submit-comment-btn {
-      background: transparent;
-      border: none;
       color: var(--text-muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      cursor: pointer;
-      transition: color 0.3s ease;
-      align-self: flex-end;
-      margin-top: -36px;
+      padding: 24px 0;
     }
 
-    .submit-comment-btn:hover { color: var(--text-main); }
-
-    @media (max-width: 900px) {
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
       .nav-header-bar { top: 25px; left: 20px; gap: 14px; }
       .nav-item { font-size: 18px; }
-      .article-wrapper { margin-top: 15vh; }
-      .form-row { flex-direction: column; gap: 0; }
-      .submit-comment-btn { margin-top: 16px; align-self: flex-start; }
+      .directory-wrapper { left: 6vw; width: 88vw; top: 15vh; }
+      .article-card { grid-template-columns: 1fr; gap: 20px; }
+      .card-thumb { height: 200px; }
     }
   </style>
 </head>
@@ -251,165 +156,74 @@
     <a href="index.html" class="nav-item">info</a>
     <a href="projects.html" class="nav-item">projects</a>
     <a href="blog.html" class="nav-item">blog</a>
-    <a href="read.html" class="nav-item">read</a>
+    <a href="read.html" class="nav-item active">read</a>
     <a href="radio.html" class="nav-item">radio</a>
     <a href="store.html" class="nav-item">store</a>
     <a href="contact.html" class="nav-item">contact</a>
   </header>
 
-  <div class="article-wrapper" id="article-container">
-    <div style="font-family: 'Inter'; font-size: 11px; color: #666; letter-spacing: 2px;">// LOADING ARTICLE...</div>
+  <!-- Directory Container -->
+  <div class="directory-wrapper">
+    
+    <!-- Dynamic Stream Container -->
+    <div class="article-stream" id="article-stream">
+      <div class="empty-state">// FETCHING ARCHIVES...</div>
+    </div>
+
   </div>
 
   <script>
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com" 
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const ARTICLE_ID = urlParams.get('id') || "architecture_of_independence_01";
-
     let db = null;
-    let articleRef = null;
 
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
-      articleRef = db.ref(`articles/${ARTICLE_ID}`);
-      loadArticleData();
+      loadDirectory();
     } catch (e) {
       console.error(e);
     }
 
-    function loadArticleData() {
-      articleRef.once("value", (snapshot) => {
-        const article = snapshot.val();
-        const container = document.getElementById('article-container');
-
-        if (!article) {
-          container.innerHTML = `<div style="font-family: 'Inter'; font-size: 11px; color: #666; letter-spacing: 2px;">// ARTICLE NOT FOUND</div>`;
+    function loadDirectory() {
+      const stream = document.getElementById('article-stream');
+      
+      db.ref("articles").on("value", (snapshot) => {
+        stream.innerHTML = "";
+        
+        if (!snapshot.exists()) {
+          stream.innerHTML = `<div class="empty-state">// ARCHIVE CURRENTLY EMPTY</div>`;
           return;
         }
 
-        let paragraphsHtml = "";
-        if (article.body && Array.isArray(article.body)) {
-          paragraphsHtml = article.body.map(p => `<p>${escapeHtml(p)}</p>`).join("");
-        }
-
-        container.innerHTML = `
-          <header class="article-header">
-            <h1 class="article-title">${escapeHtml(article.title)}</h1>
-            <div class="article-meta">
-              <span>${escapeHtml(article.volume)} — Essay</span>
-              <span>${escapeHtml(article.dateStr)}</span>
-            </div>
-          </header>
-
-          <main class="article-content">
-            ${paragraphsHtml}
-          </main>
-
-          <div class="engagement-bar">
-            <button class="like-btn" id="like-btn" onclick="addLike()">
-              <span id="like-icon">＋</span> <span id="like-count">0 LIKES</span>
-            </button>
-            <span style="font-family: 'Inter', sans-serif; font-size: 10px; color: #444; letter-spacing: 1px;">SECURE ARCHIVE</span>
-          </div>
-
-          <section class="comments-section">
-            <h3 class="comments-header">// PUBLIC FORUM</h3>
-            
-            <form class="comment-form" onsubmit="postComment(event)">
-              <div class="form-row">
-                <input type="text" id="comment-handle" class="comment-input" style="flex: 0.3;" placeholder="Handle" maxlength="15" required autocomplete="off">
-                <input type="text" id="comment-text" class="comment-input" style="flex: 1;" placeholder="Add to the archive..." maxlength="200" required autocomplete="off">
+        snapshot.forEach((childSnapshot) => {
+          const article = childSnapshot.val();
+          const articleId = childSnapshot.key;
+          
+          const card = document.createElement('a');
+          card.href = `article.html?id=${articleId}`;
+          card.className = 'article-card';
+          
+          const imageUrl = article.imageUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop";
+          
+          card.innerHTML = `
+            <img src="${escapeHtml(imageUrl)}" alt="" class="card-thumb">
+            <div class="card-body">
+              <div class="card-meta">
+                <span>${escapeHtml(article.dateStr || "JULY 2026")}</span>
+                <span>//</span>
+                <span>${escapeHtml(article.author || "DUCHESS")}</span>
               </div>
-              <button type="submit" class="submit-comment-btn">Submit ↗</button>
-            </form>
-
-            <div class="comment-list" id="comment-stream"></div>
-          </section>
-        `;
-
-        initRealtimeFeatures();
+              <h2 class="card-title">${escapeHtml(article.title)}</h2>
+              <p class="card-blurb">${escapeHtml(article.blurb || "")}</p>
+            </div>
+          `;
+          
+          stream.insertBefore(card, stream.firstChild);
+        });
       });
-    }
-
-    function initRealtimeFeatures() {
-      // Prevent view count spam on refresh per browser session
-      const viewKey = `duchess_viewed_${ARTICLE_ID}`;
-      if (!localStorage.getItem(viewKey)) {
-        articleRef.child("views").transaction((currentViews) => (currentViews || 0) + 1);
-        localStorage.setItem(viewKey, 'true');
-      }
-
-      // Check if user already liked this article previously
-      const likeKey = `duchess_liked_${ARTICLE_ID}`;
-      if (localStorage.getItem(likeKey)) {
-        const btn = document.getElementById('like-btn');
-        if(btn) {
-          btn.classList.add('liked');
-          document.getElementById('like-icon').innerText = '✓';
-        }
-      }
-
-      // Like Count Listener
-      articleRef.child("likes").on("value", (snapshot) => {
-        const likes = snapshot.val() || 0;
-        const likeEl = document.getElementById('like-count');
-        if(likeEl) likeEl.innerText = `${likes} LIKES`;
-      });
-
-      // Comments Listener
-      articleRef.child("comments").on("child_added", (snapshot) => {
-        const data = snapshot.val();
-        appendCommentToDOM(data.handle, data.text, data.dateStr);
-      });
-    }
-
-    function addLike() {
-      const likeKey = `duchess_liked_${ARTICLE_ID}`;
-      if (!db || localStorage.getItem(likeKey)) return;
-      
-      localStorage.setItem(likeKey, 'true');
-      
-      const btn = document.getElementById('like-btn');
-      if(btn) {
-        btn.classList.add('liked');
-        document.getElementById('like-icon').innerText = '✓';
-      }
-
-      articleRef.child("likes").transaction((currentLikes) => (currentLikes || 0) + 1);
-    }
-
-    function postComment(e) {
-      e.preventDefault();
-      const handleInput = document.getElementById('comment-handle');
-      const textInput = document.getElementById('comment-text');
-      
-      const handle = handleInput.value.trim();
-      const text = textInput.value.trim();
-      if (!handle || !text) return;
-
-      const dateOpts = { month: 'short', day: 'numeric', year: 'numeric' };
-      const dateStr = new Date().toLocaleDateString('en-US', dateOpts).toUpperCase();
-
-      articleRef.child("comments").push({ handle, text, dateStr, timestamp: Date.now() });
-      textInput.value = '';
-    }
-
-    function appendCommentToDOM(handle, text, dateStr) {
-      const list = document.getElementById('comment-stream');
-      if (!list) return;
-      
-      const item = document.createElement('div');
-      item.className = 'comment-item';
-      item.innerHTML = `
-        <div class="comment-meta">${escapeHtml(handle)} // ${dateStr}</div>
-        <div class="comment-text">${escapeHtml(text)}</div>
-      `;
-      list.insertBefore(item, list.firstChild);
     }
 
     function escapeHtml(str) {
