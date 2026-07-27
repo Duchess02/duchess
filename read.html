@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>read // duchess</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Inter:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- Firebase Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-void: #000000;
+      --text-main: #ffffff;
+      --text-muted: #666666;
+      --accent: #a0a0a2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: var(--text-main); 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23A0A0A2'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Minimal Navigation */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 8vw; 
+      display: flex; 
+      gap: 40px; 
+      z-index: 100; 
+    }
+    
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+      font-size: 24px; 
+      transition: color 0.4s ease;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    
+    .nav-item:hover { color: var(--text-main); }
+    .nav-item.active { color: var(--text-main) !important; pointer-events: none; }
+
+    /* Directory Layout */
+    .directory-wrapper {
+      position: absolute;
+      top: 25vh;
+      left: 8vw;
+      width: clamp(320px, 84vw, 900px);
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .directory-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #222;
+      padding-bottom: 24px;
+    }
+
+    .directory-title {
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 300;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    .status-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Article List Container */
+    .article-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .article-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid #111;
+      text-decoration: none;
+      transition: border-color 0.4s ease;
+    }
+
+    .article-row:hover {
+      border-bottom-color: var(--text-muted);
+    }
+
+    .row-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .article-vol {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .article-headline {
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 300;
+      font-size: clamp(20px, 2vw, 24px);
+      color: var(--text-main);
+      transition: color 0.3s ease;
+    }
+
+    .row-right {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 24px 0;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      .nav-header-bar { top: 25px; left: 20px; gap: 14px; }
+      .nav-item { font-size: 18px; }
+      .directory-wrapper { left: 6vw; width: 88vw; top: 15vh; }
+      .article-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item">info</a>
+    <a href="projects.html" class="nav-item">projects</a>
+    <a href="blog.html" class="nav-item">blog</a>
+    <a href="read.html" class="nav-item active">read</a>
+    <a href="radio.html" class="nav-item">radio</a>
+    <a href="store.html" class="nav-item">store</a>
+    <a href="contact.html" class="nav-item">contact</a>
+  </header>
+
+  <!-- Index Directory -->
+  <div class="directory-wrapper">
+    
+    <div class="directory-header">
+      <span class="status-tag">Index // Text & Archive</span>
+      <h1 class="directory-title">Essays, Notes & Documentation</h1>
+    </div>
+
+    <!-- Blank container where Firebase injects article rows -->
+    <div class="article-list" id="article-directory-stream">
+      <div class="empty-state">// FETCHING ARCHIVES...</div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- FIREBASE REALTIME DATABASE CONFIG ---
+    const firebaseConfig = {
+      databaseURL: "https://your-firebase-app.firebaseio.com" 
+    };
+
+    let db = null;
+
+    try {
+      if (firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("your-firebase-app")) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        loadArticlesFromFirebase();
+      } else {
+        document.getElementById('article-directory-stream').innerHTML = `
+          <div class="empty-state">// LOCAL PREVIEW: NO FIREBASE URL CONFIGURED</div>
+        `;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    function loadArticlesFromFirebase() {
+      const stream = document.getElementById('article-directory-stream');
+      
+      // Listen for articles stored in the database under node "articles_meta"
+      db.ref("articles_meta").on("value", (snapshot) => {
+        stream.innerHTML = ""; // Clear loader
+        
+        if (!snapshot.exists()) {
+          stream.innerHTML = `<div class="empty-state">// ARCHIVE CURRENTLY EMPTY</div>`;
+          return;
+        }
+
+        snapshot.forEach((childSnapshot) => {
+          const article = childSnapshot.val();
+          
+          const row = document.createElement('a');
+          row.href = article.url || `article.html?id=${childSnapshot.key}`;
+          row.className = 'article-row';
+          
+          row.innerHTML = `
+            <div class="row-left">
+              <span class="article-vol">${escapeHtml(article.volume || "VOL. 01")}</span>
+              <span class="article-headline">${escapeHtml(article.title)}</span>
+            </div>
+            <div class="row-right">
+              ${escapeHtml(article.dateStr)}
+            </div>
+          `;
+          
+          // Append newest to top
+          stream.insertBefore(row, stream.firstChild);
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+
+</body>
+</html>
