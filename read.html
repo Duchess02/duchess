@@ -94,29 +94,6 @@
       padding-bottom: 16px;
     }
 
-    .live-stats {
-      display: flex;
-      gap: 16px;
-      color: var(--accent);
-    }
-
-    .stat-pulse {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      background-color: #33ff77;
-      border-radius: 50%;
-      margin-right: 6px;
-      box-shadow: 0 0 8px #33ff77;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-
     /* Article Body */
     .article-content {
       font-family: 'Inter', sans-serif;
@@ -161,7 +138,7 @@
     }
 
     .like-btn:hover { color: var(--text-main); }
-    .like-btn.liked { color: #fff; }
+    .like-btn.liked { color: #fff; pointer-events: none; }
 
     /* Comment Section */
     .comments-section {
@@ -287,16 +264,14 @@
   <script>
     // --- FIREBASE CONFIG ---
     const firebaseConfig = {
-      databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com/" 
+      databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com" 
     };
 
-    // Get article ID from the URL query string (e.g., article.html?id=arch_01)
     const urlParams = new URLSearchParams(window.location.search);
     const ARTICLE_ID = urlParams.get('id') || "architecture_of_independence_01";
 
     let db = null;
     let articleRef = null;
-    let hasLikedLocally = false;
 
     try {
       firebase.initializeApp(firebaseConfig);
@@ -308,7 +283,6 @@
     }
 
     function loadArticleData() {
-      // 1. Fetch Article Content & Meta
       articleRef.once("value", (snapshot) => {
         const article = snapshot.val();
         const container = document.getElementById('article-container');
@@ -318,21 +292,17 @@
           return;
         }
 
-        // Build paragraphs HTML from Firebase array
         let paragraphsHtml = "";
         if (article.body && Array.isArray(article.body)) {
           paragraphsHtml = article.body.map(p => `<p>${escapeHtml(p)}</p>`).join("");
         }
 
-        // Inject Full Layout
         container.innerHTML = `
           <header class="article-header">
             <h1 class="article-title">${escapeHtml(article.title)}</h1>
             <div class="article-meta">
               <span>${escapeHtml(article.volume)} — Essay</span>
-              <div class="live-stats">
-                <span id="view-count"><span class="stat-pulse"></span>0 VIEWS</span>
-              </div>
+              <span>${escapeHtml(article.dateStr)}</span>
             </div>
           </header>
 
@@ -344,7 +314,7 @@
             <button class="like-btn" id="like-btn" onclick="addLike()">
               <span id="like-icon">＋</span> <span id="like-count">0 LIKES</span>
             </button>
-            <span style="font-family: 'Inter', sans-serif; font-size: 10px; color: #444; letter-spacing: 1px;">REAL-TIME SYNC ACTIVE</span>
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; color: #444; letter-spacing: 1px;">SECURE ARCHIVE</span>
           </div>
 
           <section class="comments-section">
@@ -362,20 +332,27 @@
           </section>
         `;
 
-        // Start Realtime Listeners after DOM is injected
         initRealtimeFeatures();
       });
     }
 
     function initRealtimeFeatures() {
-      // Transactional View Counter
-      articleRef.child("views").transaction((currentViews) => (currentViews || 0) + 1);
+      // Prevent view count spam on refresh per browser session
+      const viewKey = `duchess_viewed_${ARTICLE_ID}`;
+      if (!localStorage.getItem(viewKey)) {
+        articleRef.child("views").transaction((currentViews) => (currentViews || 0) + 1);
+        localStorage.setItem(viewKey, 'true');
+      }
 
-      articleRef.child("views").on("value", (snapshot) => {
-        const views = snapshot.val() || 0;
-        const viewEl = document.getElementById('view-count');
-        if(viewEl) viewEl.innerHTML = `<span class="stat-pulse"></span>${views} VIEWS`;
-      });
+      // Check if user already liked this article previously
+      const likeKey = `duchess_liked_${ARTICLE_ID}`;
+      if (localStorage.getItem(likeKey)) {
+        const btn = document.getElementById('like-btn');
+        if(btn) {
+          btn.classList.add('liked');
+          document.getElementById('like-icon').innerText = '✓';
+        }
+      }
 
       // Like Count Listener
       articleRef.child("likes").on("value", (snapshot) => {
@@ -392,8 +369,10 @@
     }
 
     function addLike() {
-      if (!db || hasLikedLocally) return;
-      hasLikedLocally = true;
+      const likeKey = `duchess_liked_${ARTICLE_ID}`;
+      if (!db || localStorage.getItem(likeKey)) return;
+      
+      localStorage.setItem(likeKey, 'true');
       
       const btn = document.getElementById('like-btn');
       if(btn) {
