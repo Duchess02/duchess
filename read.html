@@ -19,6 +19,7 @@
       --bg-void: #000000;
       --text-main: #ffffff;
       --text-muted: #666666;
+      --text-body: #cccccc;
       --accent: #a0a0a2;
     }
 
@@ -53,112 +54,216 @@
     }
     
     .nav-item:hover { color: var(--text-main); }
-    .nav-item.active { color: var(--text-main) !important; pointer-events: none; }
 
-    /* Directory Layout */
-    .directory-wrapper {
-      position: absolute;
-      top: 25vh;
-      left: 8vw;
-      width: clamp(320px, 84vw, 900px);
+    /* Article Container */
+    .article-wrapper {
+      max-width: 680px;
+      margin: 22vh auto 10vh auto;
+      padding: 0 4vw;
       display: flex;
       flex-direction: column;
-      gap: 48px;
+      gap: 40px;
     }
 
-    .directory-header {
+    /* Header & Meta */
+    .article-header {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      border-bottom: 1px solid #222;
-      padding-bottom: 24px;
+      gap: 16px;
     }
 
-    .directory-title {
+    .article-title {
       font-family: 'Host Grotesk', sans-serif;
       font-weight: 300;
-      font-size: clamp(32px, 4vw, 48px);
-      line-height: 1.1;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.05;
       letter-spacing: -1px;
     }
 
-    .status-tag {
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    /* Article List Container */
-    .article-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .article-row {
+    .article-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 0;
-      border-bottom: 1px solid #111;
-      text-decoration: none;
-      transition: border-color 0.4s ease;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid #222;
+      padding-bottom: 16px;
     }
 
-    .article-row:hover {
-      border-bottom-color: var(--text-muted);
+    .live-stats {
+      display: flex;
+      gap: 16px;
+      color: var(--accent);
     }
 
-    .row-left {
+    .stat-pulse {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background-color: #33ff77;
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 8px #33ff77;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+
+    /* Article Body */
+    .article-content {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-body);
       display: flex;
       flex-direction: column;
+      gap: 24px;
+    }
+
+    .article-content p {
+      text-align: justify;
+    }
+
+    /* Engagement Bar */
+    .engagement-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
+      padding: 16px 0;
+      margin-top: 20px;
+    }
+
+    .like-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    .article-vol {
+    .like-btn:hover { color: var(--text-main); }
+    .like-btn.liked { color: #fff; }
+
+    /* Comment Section */
+    .comments-section {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 20px;
+    }
+
+    .comments-header {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .comment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .comment-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .comment-meta {
       font-family: 'Inter', sans-serif;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .article-headline {
-      font-family: 'Host Grotesk', sans-serif;
-      font-weight: 300;
-      font-size: clamp(20px, 2vw, 24px);
-      color: var(--text-main);
-      transition: color 0.3s ease;
-    }
-
-    .row-right {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 300;
       letter-spacing: 1px;
       color: var(--text-muted);
       text-transform: uppercase;
     }
 
-    .empty-state {
+    .comment-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-body);
+    }
+
+    .comment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .comment-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #333;
+      color: var(--text-main);
       font-family: 'Inter', sans-serif;
       font-size: 12px;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 24px 0;
+      padding: 12px 0;
+      outline: none;
+      transition: border-color 0.4s ease;
+      width: 100%;
     }
 
-    /* Mobile Responsive */
+    .comment-input::placeholder {
+      color: #444;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .comment-input:focus { border-bottom-color: var(--text-main); }
+
+    .submit-comment-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      align-self: flex-end;
+      margin-top: -36px;
+    }
+
+    .submit-comment-btn:hover { color: var(--text-main); }
+
     @media (max-width: 900px) {
       .nav-header-bar { top: 25px; left: 20px; gap: 14px; }
       .nav-item { font-size: 18px; }
-      .directory-wrapper { left: 6vw; width: 88vw; top: 15vh; }
-      .article-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .article-wrapper { margin-top: 15vh; }
+      .form-row { flex-direction: column; gap: 0; }
+      .submit-comment-btn { margin-top: 16px; align-self: flex-start; }
     }
   </style>
 </head>
@@ -169,82 +274,163 @@
     <a href="index.html" class="nav-item">info</a>
     <a href="projects.html" class="nav-item">projects</a>
     <a href="blog.html" class="nav-item">blog</a>
-    <a href="read.html" class="nav-item active">read</a>
+    <a href="read.html" class="nav-item">read</a>
     <a href="radio.html" class="nav-item">radio</a>
     <a href="store.html" class="nav-item">store</a>
     <a href="contact.html" class="nav-item">contact</a>
   </header>
 
-  <!-- Index Directory -->
-  <div class="directory-wrapper">
-    
-    <div class="directory-header">
-      <span class="status-tag">Index // Text & Archive</span>
-      <h1 class="directory-title">Essays, Notes & Documentation</h1>
-    </div>
-
-    <!-- Blank container where Firebase injects article rows -->
-    <div class="article-list" id="article-directory-stream">
-      <div class="empty-state">// FETCHING ARCHIVES...</div>
-    </div>
-
+  <div class="article-wrapper" id="article-container">
+    <div style="font-family: 'Inter'; font-size: 11px; color: #666; letter-spacing: 2px;">// LOADING ARTICLE...</div>
   </div>
 
   <script>
-    // --- FIREBASE REALTIME DATABASE CONFIG ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       databaseURL: "https://your-firebase-app.firebaseio.com" 
     };
 
+    // Get article ID from the URL query string (e.g., article.html?id=arch_01)
+    const urlParams = new URLSearchParams(window.location.search);
+    const ARTICLE_ID = urlParams.get('id') || "architecture_of_independence_01";
+
     let db = null;
+    let articleRef = null;
+    let hasLikedLocally = false;
 
     try {
-      if (firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("your-firebase-app")) {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        loadArticlesFromFirebase();
-      } else {
-        document.getElementById('article-directory-stream').innerHTML = `
-          <div class="empty-state">// LOCAL PREVIEW: NO FIREBASE URL CONFIGURED</div>
-        `;
-      }
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      articleRef = db.ref(`articles/${ARTICLE_ID}`);
+      loadArticleData();
     } catch (e) {
       console.error(e);
     }
 
-    function loadArticlesFromFirebase() {
-      const stream = document.getElementById('article-directory-stream');
-      
-      // Listen for articles stored in the database under node "articles_meta"
-      db.ref("articles_meta").on("value", (snapshot) => {
-        stream.innerHTML = ""; // Clear loader
-        
-        if (!snapshot.exists()) {
-          stream.innerHTML = `<div class="empty-state">// ARCHIVE CURRENTLY EMPTY</div>`;
+    function loadArticleData() {
+      // 1. Fetch Article Content & Meta
+      articleRef.once("value", (snapshot) => {
+        const article = snapshot.val();
+        const container = document.getElementById('article-container');
+
+        if (!article) {
+          container.innerHTML = `<div style="font-family: 'Inter'; font-size: 11px; color: #666; letter-spacing: 2px;">// ARTICLE NOT FOUND</div>`;
           return;
         }
 
-        snapshot.forEach((childSnapshot) => {
-          const article = childSnapshot.val();
-          
-          const row = document.createElement('a');
-          row.href = article.url || `article.html?id=${childSnapshot.key}`;
-          row.className = 'article-row';
-          
-          row.innerHTML = `
-            <div class="row-left">
-              <span class="article-vol">${escapeHtml(article.volume || "VOL. 01")}</span>
-              <span class="article-headline">${escapeHtml(article.title)}</span>
+        // Build paragraphs HTML from Firebase array
+        let paragraphsHtml = "";
+        if (article.body && Array.isArray(article.body)) {
+          paragraphsHtml = article.body.map(p => `<p>${escapeHtml(p)}</p>`).join("");
+        }
+
+        // Inject Full Layout
+        container.innerHTML = `
+          <header class="article-header">
+            <h1 class="article-title">${escapeHtml(article.title)}</h1>
+            <div class="article-meta">
+              <span>${escapeHtml(article.volume)} — Essay</span>
+              <div class="live-stats">
+                <span id="view-count"><span class="stat-pulse"></span>0 VIEWS</span>
+              </div>
             </div>
-            <div class="row-right">
-              ${escapeHtml(article.dateStr)}
-            </div>
-          `;
-          
-          // Append newest to top
-          stream.insertBefore(row, stream.firstChild);
-        });
+          </header>
+
+          <main class="article-content">
+            ${paragraphsHtml}
+          </main>
+
+          <div class="engagement-bar">
+            <button class="like-btn" id="like-btn" onclick="addLike()">
+              <span id="like-icon">＋</span> <span id="like-count">0 LIKES</span>
+            </button>
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; color: #444; letter-spacing: 1px;">REAL-TIME SYNC ACTIVE</span>
+          </div>
+
+          <section class="comments-section">
+            <h3 class="comments-header">// PUBLIC FORUM</h3>
+            
+            <form class="comment-form" onsubmit="postComment(event)">
+              <div class="form-row">
+                <input type="text" id="comment-handle" class="comment-input" style="flex: 0.3;" placeholder="Handle" maxlength="15" required autocomplete="off">
+                <input type="text" id="comment-text" class="comment-input" style="flex: 1;" placeholder="Add to the archive..." maxlength="200" required autocomplete="off">
+              </div>
+              <button type="submit" class="submit-comment-btn">Submit ↗</button>
+            </form>
+
+            <div class="comment-list" id="comment-stream"></div>
+          </section>
+        `;
+
+        // Start Realtime Listeners after DOM is injected
+        initRealtimeFeatures();
       });
+    }
+
+    function initRealtimeFeatures() {
+      // Transactional View Counter
+      articleRef.child("views").transaction((currentViews) => (currentViews || 0) + 1);
+
+      articleRef.child("views").on("value", (snapshot) => {
+        const views = snapshot.val() || 0;
+        const viewEl = document.getElementById('view-count');
+        if(viewEl) viewEl.innerHTML = `<span class="stat-pulse"></span>${views} VIEWS`;
+      });
+
+      // Like Count Listener
+      articleRef.child("likes").on("value", (snapshot) => {
+        const likes = snapshot.val() || 0;
+        const likeEl = document.getElementById('like-count');
+        if(likeEl) likeEl.innerText = `${likes} LIKES`;
+      });
+
+      // Comments Listener
+      articleRef.child("comments").on("child_added", (snapshot) => {
+        const data = snapshot.val();
+        appendCommentToDOM(data.handle, data.text, data.dateStr);
+      });
+    }
+
+    function addLike() {
+      if (!db || hasLikedLocally) return;
+      hasLikedLocally = true;
+      
+      const btn = document.getElementById('like-btn');
+      if(btn) {
+        btn.classList.add('liked');
+        document.getElementById('like-icon').innerText = '✓';
+      }
+
+      articleRef.child("likes").transaction((currentLikes) => (currentLikes || 0) + 1);
+    }
+
+    function postComment(e) {
+      e.preventDefault();
+      const handleInput = document.getElementById('comment-handle');
+      const textInput = document.getElementById('comment-text');
+      
+      const handle = handleInput.value.trim();
+      const text = textInput.value.trim();
+      if (!handle || !text) return;
+
+      const dateOpts = { month: 'short', day: 'numeric', year: 'numeric' };
+      const dateStr = new Date().toLocaleDateString('en-US', dateOpts).toUpperCase();
+
+      articleRef.child("comments").push({ handle, text, dateStr, timestamp: Date.now() });
+      textInput.value = '';
+    }
+
+    function appendCommentToDOM(handle, text, dateStr) {
+      const list = document.getElementById('comment-stream');
+      if (!list) return;
+      
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+      item.innerHTML = `
+        <div class="comment-meta">${escapeHtml(handle)} // ${dateStr}</div>
+        <div class="comment-text">${escapeHtml(text)}</div>
+      `;
+      list.insertBefore(item, list.firstChild);
     }
 
     function escapeHtml(str) {
