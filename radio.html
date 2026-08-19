@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>radio // duchess</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <!-- SoundCloud Widget API -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+
+  <!-- Firebase Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --text-grey: rgba(140, 155, 175, 1);
+      --bg-void: #ffffff;
+      --hover-color: #1a5c8a;
+      --accent-blue: #143852;
+      --box-underlay: rgba(63, 169, 245, 0.05);
+      --box-border: rgba(63, 169, 245, 0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: var(--accent-blue); 
+      font-family: 'Host Grotesk', sans-serif; 
+      font-weight: 400;
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' rx='3' fill='%23143852'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation Header */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 24px; 
+      display: flex; 
+      align-items: center; 
+      gap: 32px; 
+      z-index: 100; 
+    }
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-weight: 400; 
+      font-size: 24px; 
+      display: flex;
+      align-items: center;
+      transition: color 0.3s;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23143852'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    .nav-item img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+    .nav-item:hover { color: var(--hover-color); }
+    .nav-item.active { color: var(--accent-blue) !important; pointer-events: none; }
+
+    /* Single Unified Master Container Box */
+    .broadcast-container {
+      position: relative;
+      margin: 120px auto 80px auto;
+      width: calc(100vw - 80px);
+      max-width: 1060px;
+      border: 1px solid var(--box-border);
+      background: var(--box-underlay);
+      border-radius: 20px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 32px;
+      align-items: stretch;
+      box-shadow: 0 10px 30px rgba(20, 56, 82, 0.03);
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Radio Console Inner Layout */
+    .radio-console {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Apple Music Style Layout (Compact) */
+    .apple-player-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Prominent Artwork Top with Softer Radius */
+    .artwork-square {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: rgba(20, 56, 82, 0.04);
+      border-radius: 12px;
+      border: 1px solid var(--box-border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(20, 56, 82, 0.04);
+    }
+
+    .artwork-square img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .artwork-placeholder {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 10px;
+      color: var(--text-grey);
+      letter-spacing: 1px;
+      text-align: center;
+      padding: 8px;
+    }
+
+    /* Track Metadata Info */
+    .track-meta-section {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .track-title {
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--accent-blue);
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .artist-subtitle {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 10px;
+      color: var(--text-grey);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Scrubber / Progress Bar */
+    .scrubber-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(20, 56, 82, 0.08);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--accent-blue);
+      border-radius: 4px;
+      transition: width 0.1s linear;
+    }
+
+    .time-tracker {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 9px;
+      color: var(--text-grey);
+      letter-spacing: 0.5px;
+    }
+
+    /* Playback Control Cluster */
+    .playback-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 2px 0;
+    }
+
+    .control-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      transition: opacity 0.2s ease, transform 0.1s ease;
+      padding: 2px;
+    }
+
+    .control-icon-btn:hover {
+      opacity: 0.6;
+    }
+
+    .control-icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    .control-icon-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .play-pause-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Live Chat Console Inner Layout */
+    .chat-console {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+      min-height: 420px;
+    }
+
+    .chat-header {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 11px;
+      color: var(--accent-blue);
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid var(--box-border);
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .chat-messages {
+      flex: 1;
+      height: 250px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 12px;
+      padding-right: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: rgba(20, 56, 82, 0.02); }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(20, 56, 82, 0.15); border-radius: 4px; }
+
+    .msg-line {
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .msg-time { color: var(--text-grey); margin-right: 6px; }
+    .msg-user { color: var(--accent-blue); font-weight: 700; margin-right: 6px; }
+    .msg-text { color: #2c4d66; }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--box-border);
+      padding-top: 14px;
+    }
+
+    .chat-input-bar input {
+      background: #ffffff;
+      border: 1px solid var(--box-border);
+      border-radius: 10px;
+      color: var(--accent-blue);
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 11px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-bar input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .input-handle { width: 90px; }
+    .input-msg { flex: 1; }
+
+    .send-btn {
+      background: var(--accent-blue);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 10px;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .send-btn:hover { background: #1d4e74; }
+
+    #soundcloud-player { display: none; }
+
+    /* Mobile Layout Stack */
+    @media (max-width: 900px) {
+      .nav-header-bar { top: 25px; left: 16px; gap: 16px; }
+      .nav-item img { height: 28px; }
+      .broadcast-container { 
+        width: 90vw; 
+        margin-top: 90px; 
+        grid-template-columns: 1fr; 
+        padding: 20px; 
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item"><img src="info.png" alt="info"></a>
+    <a href="projects.html" class="nav-item"><img src="projects.png" alt="projects"></a>
+    <a href="blog.html" class="nav-item"><img src="blog.png" alt="blog"></a>
+    <a href="read.html" class="nav-item"><img src="read.png" alt="read"></a>
+    <a href="radio.html" class="nav-item"><img src="radio.png" alt="radio"></a>
+    <a href="contact.html" class="nav-item"><img src="contact.png" alt="contact"></a>
+  </header>
+
+  <!-- Unified Master Broadcast Container Box -->
+  <div class="broadcast-container">
+    
+    <!-- LEFT: Radio Player -->
+    <div class="left-column">
+      <div class="radio-console">
+        <div class="apple-player-layout">
+          <!-- Large Artwork Top -->
+          <div class="artwork-square">
+            <span class="artwork-placeholder" id="art-loading">LOADING ARTWORK</span>
+            <img id="cover-art" src="" alt="Broadcast Artwork" style="display: none;">
+          </div>
+
+          <!-- Track Info & Metadata -->
+          <div class="track-meta-section">
+            <div class="track-title" id="track-title-tag">TRANSMISSION // 12-06-26</div>
+            <div class="artist-subtitle">6AMIMOSA</div>
+          </div>
+
+          <!-- Scrubber and Track Length Bar -->
+          <div class="scrubber-wrapper">
+            <div class="progress-bar-container" id="progress-container" onclick="seekStream(event)">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="time-tracker">
+              <span id="time-current">00:00</span>
+              <span id="time-total">00:00</span>
+            </div>
+          </div>
+
+          <!-- Playback Controls Cluster -->
+          <div class="playback-controls">
+            <button class="control-icon-btn" onclick="skipBackward()" title="Rewind 10s">
+              <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+            </button>
+            
+            <button class="control-icon-btn play-pause-btn" id="play-pause-icon-btn" onclick="togglePlay()" title="Play / Pause">
+              <!-- Play Icon SVG (default) -->
+              <svg id="play-icon-svg" viewBox="0 0 24 24" style="display: block;">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <!-- Pause Icon SVG (hidden initially) -->
+              <svg id="pause-icon-svg" viewBox="0 0 24 24" style="display: none;">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            </button>
+
+            <button class="control-icon-btn" onclick="skipForward()" title="Forward 10s">
+              <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden Engine -->
+        <iframe 
+          id="soundcloud-player" 
+          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/user-625644678/6amimosa-12-06-26&auto_play=false" 
+          allow="autoplay">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Chat Box -->
+    <div class="right-column">
+      <div class="chat-console">
+        <div class="chat-header">
+          <span>CHAT</span>
+          <span>ONLINE</span>
+        </div>
+
+        <div class="chat-messages" id="chat-box">
+          <div class="msg-line">
+            <span class="msg-time">00:00</span>
+            <span class="msg-user">SYSTEM:</span>
+            <span class="msg-text">Welcome to the broadcast frequency. Keep it civil.</span>
+          </div>
+        </div>
+
+        <form class="chat-input-bar" onsubmit="sendMessage(event)">
+          <input type="text" id="user-handle" class="input-handle" placeholder="handle" maxlength="12" value="guest" required>
+          <input type="text" id="user-msg" class="input-msg" placeholder="type message..." maxlength="120" required autocomplete="off">
+          <button type="submit" class="send-btn">SEND</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- 1. SOUNDCLOUD PLAYER API ---
+    let widget;
+    let isPlaying = false;
+    let totalDurationMs = 0;
+    let currentPositionMs = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const iframeElement = document.getElementById('soundcloud-player');
+      widget = SC.Widget(iframeElement);
+
+      widget.bind(SC.Widget.Events.READY, () => {
+        widget.getCurrentSound((sound) => {
+          if (sound) {
+            if (sound.title) {
+              document.getElementById('track-title-tag').innerText = sound.title.toUpperCase();
+            }
+
+            let artUrl = sound.artwork_url || (sound.user ? sound.user.avatar_url : '');
+            if (artUrl) {
+              artUrl = artUrl.replace('-large.jpg', '-t500x500.jpg');
+              const imgElem = document.getElementById('cover-art');
+              imgElem.src = artUrl;
+              imgElem.onload = () => {
+                document.getElementById('art-loading').style.display = 'none';
+                imgElem.style.display = 'block';
+              };
+            }
+          }
+        });
+
+        widget.getDuration((duration) => {
+          totalDurationMs = duration;
+          document.getElementById('time-total').innerText = formatTime(duration);
+        });
+      });
+
+      widget.bind(SC.Widget.Events.PLAY_PROGRESS, (data) => {
+        currentPositionMs = data.currentPosition;
+        const percent = (data.currentPosition / totalDurationMs) * 100;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
+        document.getElementById('time-current').innerText = formatTime(data.currentPosition);
+      });
+
+      widget.bind(SC.Widget.Events.PLAY, () => updateUI(true));
+      widget.bind(SC.Widget.Events.PAUSE, () => updateUI(false));
+    });
+
+    function togglePlay() {
+      if (widget) widget.toggle();
+    }
+
+    function seekStream(e) {
+      if (!totalDurationMs || !widget) return;
+      const bar = document.getElementById('progress-container');
+      const clickPosition = e.offsetX / bar.offsetWidth;
+      widget.seekTo(totalDurationMs * clickPosition);
+    }
+
+    function skipBackward() {
+      if (!widget || !totalDurationMs) return;
+      const newPos = Math.max(0, currentPositionMs - 10000);
+      widget.seekTo(newPos);
+    }
+
+    function skipForward() {
+      if (!widget || !totalDurationMs) return;
+      const newPos = Math.min(totalDurationMs, currentPositionMs + 10000);
+      widget.seekTo(newPos);
+    }
+
+    function updateUI(live) {
+      isPlaying = live;
+      const playIcon = document.getElementById('play-icon-svg');
+      const pauseIcon = document.getElementById('pause-icon-svg');
+
+      if (live) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      } else {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
+    }
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // --- 2. REAL-TIME CHAT INTEGRATION ---
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+    const firebaseConfig = {
+      databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com/" 
+    };
+
+    let db = null;
+    try {
+      if (firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("your-firebase-app")) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        
+        db.ref("chat_messages").limitToLast(100).on("child_added", (snapshot) => {
+          const val = snapshot.val();
+          const now = Date.now();
+
+          if (!val.timestamp || (now - val.timestamp < TWENTY_FOUR_HOURS)) {
+            appendChatMessage(val.time, val.handle, val.msg);
+          } else {
+            snapshot.ref.remove();
+          }
+        });
+      }
+    } catch (e) {
+      console.log("Running chat in local preview mode.");
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const handleInput = document.getElementById('user-handle');
+      const msgInput = document.getElementById('user-msg');
+      
+      const handle = handleInput.value.trim() || 'guest';
+      const msg = msgInput.value.trim();
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      const timestamp = Date.now();
+
+      if (!msg) return;
+
+      if (db) {
+        db.ref("chat_messages").push({ handle, msg, time, timestamp });
+      } else {
+        appendChatMessage(time, handle, msg);
+      }
+
+      msgInput.value = '';
+    }
+
+    function appendChatMessage(time, handle, text) {
+      const box = document.getElementById('chat-box');
+      const line = document.createElement('div');
+      line.className = 'msg-line';
+      line.innerHTML = `<span class="msg-time">${time}</span><span class="msg-user">${escapeHtml(handle)}:</span><span class="msg-text">${escapeHtml(text)}</span>`;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+
+</body>
+</html>
