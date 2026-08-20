@@ -1,5 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<!-- Static Navigation: This stays exactly the same on every project -->
+<nav class="duchess-top-bar">
+    <a href="portfolio.html" class="back-button">← BACK TO INDEX</a>
+    <div class="logo-container">
+        <!-- Your custom typography logo goes here -->
+        <span class="duchess-logo">Duchess</span> 
+    </div>
+</nav>
+
+<!-- Dynamic Content: Firebase injects the text and images here -->
+<main class="project-container">
+    <header class="project-header">
+        <h1 id="project-title">--</h1>
+        <p id="project-category" class="subtitle">--</p>
+    </header>
+
+    <!-- The Carousel / Thumbnail Area -->
+    <section id="project-carousel" class="media-gallery">
+        <!-- JavaScript will automatically create <img src="..."> tags here -->
+    </section>
+
+    <!-- The Case Study Text -->
+    <article id="case-study-content" class="editorial-text">
+        <!-- JavaScript will inject the pitch here -->
+    </article>
+</main>
+  
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -352,6 +380,47 @@
   </div>
 
   <script>
+
+    import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+const db = getFirestore();
+
+// 1. Get the project ID from the URL (e.g., "?id=ebril-tour")
+const urlParams = new URLSearchParams(window.location.search);
+const projectId = urlParams.get('id'); 
+
+async function loadProject() {
+    if (!projectId) return; // Exit if no ID is found
+
+    // 2. Fetch the specific project data from Firebase
+    const docRef = doc(db, "case_studies", projectId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+
+        // 3. Inject the text into your HTML elements
+        document.getElementById("project-title").innerText = data.title;
+        document.getElementById("case-study-content").innerText = data.case_study_text;
+
+        // 4. Build the image carousel dynamically
+        const carouselContainer = document.getElementById("project-carousel");
+        
+        data.carousel_images.forEach(imageUrl => {
+            // Create an image element for every file in your Firebase array
+            let imgElement = document.createElement("img");
+            imgElement.src = imageUrl; 
+            imgElement.className = "carousel-slide"; // Add your CSS class here
+            carouselContainer.appendChild(imgElement);
+        });
+
+    } else {
+        console.log("No such project found!");
+    }
+}
+
+loadProject();
+    
     // INLINE LIBRARY CARDS DATA
     // To add new images in the future, just add items to this array:
     const libraryCards = [
