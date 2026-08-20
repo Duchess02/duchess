@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>duchess // by khizer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Michroma&family=Raleway+Dots&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-grey: #fff6e2;
+      --bg-void: #000000;
+      --hover-color: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: #fff6e2; 
+      font-family: sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23fff6e2'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation positioned at left: 24px */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 24px; 
+      display: flex; 
+      align-items: center; 
+      gap: 32px; 
+      z-index: 100; 
+    }
+    
+    .nav-item { 
+      text-decoration: none; 
+      color: var(--text-grey); 
+      font-family: 'Host Grotesk', sans-serif; 
+      font-weight: 700; 
+      font-size: 24px; 
+      display: flex;
+      align-items: center;
+      transition: color 0.3s; 
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+    
+    .nav-item img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-item.active { 
+      pointer-events: none; 
+    }
+
+    /* Layout Columns aligned to left: 24px */
+    .left-editorial-column { 
+      position: absolute; 
+      left: 24px; 
+      top: 25vh; 
+      width: calc(100vw - 48px); 
+      height: 65vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-end; 
+    }
+
+    /* Bottom Dock */
+    .bottom-dock-alignment-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-end; 
+      width: 100%; 
+      padding-bottom: 20px; 
+      position: relative;
+    }
+
+    /* Draggable Music Widget */
+    .embed-1-3-music {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      z-index: 10;
+      will-change: transform;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .embed-1-3-music:active {
+      cursor: grabbing;
+    }
+
+    /* Soft rounded edges on album art */
+    #album-art { 
+      width: 150px; 
+      height: 150px; 
+      display: none; 
+      object-fit: cover; 
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      pointer-events: none;
+    }
+
+    /* Music Metadata styled to match Host Grotesk stack */
+    .music-metadata {
+      font-family: 'Host Grotesk', sans-serif;
+      color: var(--text-grey);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-width: 260px;
+      pointer-events: none;
+    }
+
+    .music-status {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.45;
+    }
+
+    .music-track {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      color: var(--text-grey);
+    }
+
+    .music-artist {
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.65;
+      letter-spacing: -0.01em;
+    }
+
+    .clock-coordinates-group { 
+      text-align: right; 
+      color: var(--text-grey); 
+      font-family: 'Raleway Dots', monospace; 
+      user-select: none;
+    }
+	
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .nav-header-bar {
+        top: 25px;
+        left: 16px;
+        gap: 16px;
+      }
+      .nav-item {
+        font-size: 18px;
+      }
+      .nav-item img { height: 28px; }
+
+      .left-editorial-column {
+        left: 16px;
+        width: calc(100% - 32px);
+        top: 14vh;
+        height: auto;
+        position: relative;
+      }
+
+      .bottom-dock-alignment-row {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 30px;
+        margin-top: 40px;
+        padding-bottom: 50px;
+      }
+
+      .clock-coordinates-group {
+        text-align: left;
+      }
+      #live-time { font-size: 32px !important; }
+      #live-date { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item active"><img src="info2.png" alt="info"></a>
+    <a href="projects.html" class="nav-item"><img src="projects.png" alt="projects"></a>
+    <a href="blog.html" class="nav-item"><img src="blog.png" alt="blog"></a>
+    <a href="read.html" class="nav-item"><img src="read2.png" alt="read"></a>
+    <a href="radio.html" class="nav-item"><img src="radio2.png" alt="radio"></a>
+    <a href="contact.html" class="nav-item"><img src="contact.png" alt="contact"></a>
+  </header>
+
+  <div class="left-editorial-column">
+    <div class="bottom-dock-alignment-row">
+      <div class="embed-1-3-music" id="draggable-music">
+        <img id="album-art" src="" alt="Album Art" />
+        <div class="music-metadata">
+          <span class="music-status" id="music-status">BROADCAST</span>
+          <span class="music-track" id="music-track">LOADING...</span>
+          <span class="music-artist" id="music-artist"></span>
+        </div>
+      </div>
+      <div class="clock-coordinates-group">
+        <p id="live-time" style="font-size: 40px;"></p>
+        <p id="live-date" style="font-size: 30px;"></p>
+        <p style="font-family: 'Michroma', sans-serif; font-size: 18px; margin-top: 10px;">43.6548° N, 79.3884° W</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Clock Logic
+    function refresh() {
+      const now = new Date();
+      document.getElementById('live-time').innerText = now.toLocaleTimeString();
+      document.getElementById('live-date').innerText = now.toLocaleDateString();
+    }
+    setInterval(refresh, 1000);
+    refresh();
+
+    // Spotify/Last.fm Logic
+    async function streamMusicData() {
+      const apiKey = '3d6237a6791e154201820a0cf2f60f61';
+      const username = 'khizerthewzrd';
+      const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json&limit=1&_ts=${Date.now()}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.recenttracks && data.recenttracks.track && data.recenttracks.track.length > 0) {
+          const track = Array.isArray(data.recenttracks.track) ? data.recenttracks.track[0] : data.recenttracks.track;
+          const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+          
+          const statusElem = document.getElementById('music-status');
+          const trackElem = document.getElementById('music-track');
+          const artistElem = document.getElementById('music-artist');
+          const art = document.getElementById('album-art');
+          
+          statusElem.innerText = isNowPlaying ? 'NOW PLAYING' : 'LAST PLAYED';
+          trackElem.innerText = track.name || 'UNTITLED';
+          artistElem.innerText = track.artist ? (track.artist['#text'] || track.artist.name || '') : '';
+
+          if (track.image && track.image[3] && track.image[3]['#text']) {
+            art.src = track.image[3]['#text'];
+            art.style.display = 'block';
+          } else {
+            art.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.error("API Error:", e);
+        document.getElementById('music-status').innerText = 'STATUS';
+        document.getElementById('music-track').innerText = 'API OFFLINE';
+        document.getElementById('music-artist').innerText = '';
+      }
+    }
+    
+    streamMusicData();
+    setInterval(streamMusicData, 30000);
+
+    // Smooth Dragging Logic for Music Widget
+    const dragItem = document.getElementById("draggable-music");
+    let active = false;
+    let currentX = 0, currentY = 0, initialX = 0, initialY = 0;
+    let xOffset = 0, yOffset = 0;
+
+    dragItem.addEventListener("pointerdown", dragStart);
+    document.addEventListener("pointermove", drag);
+    document.addEventListener("pointerup", dragEnd);
+
+    function dragStart(e) {
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+
+      if (e.target === dragItem || dragItem.contains(e.target)) {
+        active = true;
+      }
+    }
+
+    function drag(e) {
+      if (active) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, dragItem);
+      }
+    }
+
+    function setTranslate(xPos, yPos, el) {
+      el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    }
+
+    function dragEnd() {
+      initialX = currentX;
+      initialY = currentY;
+      active = false;
+    }
+  </script>
+</body>
+</html>
