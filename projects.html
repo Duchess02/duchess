@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>projects — duchess</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-muted: #666666;
+      --bg-void: #ffffff;
+      --text-main: #000000;
+      --border-color: #e5e5e5;
+      --overlay-blue: rgba(189, 204, 212, 0.60);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: var(--text-main); 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23bdccd4'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 24px; 
+      display: flex; 
+      align-items: center;
+      gap: 32px; 
+      z-index: 100; 
+    }
+    
+    .nav-item { 
+      text-decoration: none; 
+      display: flex;
+      align-items: center;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+
+    .nav-item img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+
+    /* Page Container */
+    .projects-container {
+      width: 100%;
+      max-width: 760px;
+      margin: calc(20vh + 38px) auto 12vh auto;
+      padding: 0 24px;
+    }
+
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    .project-card {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Left Media Column */
+    .project-media-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Image Thumbnail Preview */
+    .project-preview {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #f7f7f7;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .project-preview:hover {
+      opacity: 0.92;
+      transform: scale(1.01);
+    }
+
+    .project-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .image-counter {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+
+    /* Right Meta Column */
+    .project-meta {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Host Grotesk', sans-serif;
+    }
+
+    .project-date {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .project-title {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    /* Stacked Metadata Styles in Host Grotesk */
+    .project-meta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+
+    .project-meta-item {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .scope-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .scope-tag {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      background: #f4f4f4;
+      border: 1px solid var(--border-color);
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #333333;
+    }
+
+    .project-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 18px;
+      line-height: 1.55;
+      color: #222222;
+      font-weight: 350;
+    }
+
+    /* Overlay Modal Popup */
+    .slideshow-overlay {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      right: 30px;
+      bottom: 30px;
+      width: calc(100vw - 60px);
+      height: calc(100vh - 60px);
+      background: var(--overlay-blue);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .slideshow-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .slideshow-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 960px;
+      width: 100%;
+      max-height: 85vh;
+    }
+
+    /* Side-by-side Modal Card */
+    .slideshow-card {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 65vh;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Left PDF/Image Viewer */
+    .slideshow-media-col {
+      flex: 1.3;
+      height: 100%;
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .slideshow-media {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border: none;
+      display: block;
+    }
+
+    /* Right Pure Slide Caption Column */
+    .slideshow-text-col {
+      flex: 1;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #ffffff;
+      border-left: 1px solid var(--border-color);
+      overflow-y: auto;
+    }
+
+    .slideshow-text-col p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #222222;
+      font-weight: 400;
+    }
+
+    /* Footer Controls Bar */
+    .slideshow-footer {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      padding: 0 2px;
+      font-family: 'Host Grotesk', sans-serif;
+    }
+
+    .slideshow-footer-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .slideshow-logo {
+      height: 20px;
+      width: auto;
+      display: block;
+    }
+
+    .slideshow-proj-title {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: #000000;
+      letter-spacing: -0.1px;
+      opacity: 0.9;
+    }
+
+    .slideshow-footer-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .slideshow-counter-btn {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: #000000;
+      background: transparent;
+      border: none;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slideshow-counter-btn:hover {
+      opacity: 0.7;
+    }
+
+    .slideshow-close-btn {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #111111;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      padding: 5px 16px;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.2px;
+    }
+
+    .slideshow-close-btn:hover {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.3);
+      color: #000000;
+    }
+
+    @media (max-width: 768px) {
+      .nav-header-bar { top: 25px; left: 16px; gap: 16px; }
+      .nav-item img { height: 28px; }
+      .projects-container { margin: calc(120px + 28px) auto 12vh auto; padding: 0 16px; }
+      .project-card { grid-template-columns: 1fr; gap: 20px; }
+      .slideshow-overlay { padding: 16px; }
+      .slideshow-card { flex-direction: column; height: 70vh; }
+      .slideshow-media-col { flex: 1; height: 60%; }
+      .slideshow-text-col { flex: auto; height: 40%; padding: 20px; border-left: none; border-top: 1px solid var(--border-color); }
+      .slideshow-footer-left { gap: 12px; }
+      .slideshow-logo { height: 16px; }
+      .slideshow-proj-title { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item"><img src="info.png" alt="info"></a>
+    <a href="projects.html" class="nav-item active"><img src="projects.png" alt="projects"></a>
+    <a href="blog.html" class="nav-item"><img src="blog.png" alt="blog"></a>
+    <a href="read.html" class="nav-item"><img src="read.png" alt="read"></a>
+    <a href="radio.html" class="nav-item"><img src="radio.png" alt="radio"></a>
+    <a href="contact.html" class="nav-item"><img src="contact.png" alt="contact"></a>
+  </header>
+
+  <main class="projects-container">
+    <div class="projects-list" id="projects-list">
+      <!-- Firestore dynamic content populates here -->
+    </div>
+  </main>
+
+  <div class="slideshow-overlay" id="slideshow-overlay" onclick="handleOverlayClick(event)">
+    <div class="slideshow-container">
+      <div class="slideshow-card">
+        <!-- Left: PDF or Image Media -->
+        <div class="slideshow-media-col" id="slideshow-media-col"></div>
+        
+        <!-- Right: Pure Slide Caption -->
+        <div class="slideshow-text-col" id="slideshow-text-col"></div>
+      </div>
+
+      <div class="slideshow-footer">
+        <div class="slideshow-footer-left">
+          <img src="logo.png" alt="duchess logo" class="slideshow-logo" />
+          <span class="slideshow-proj-title" id="slideshow-proj-title"></span>
+        </div>
+
+        <div class="slideshow-footer-right">
+          <button class="slideshow-counter-btn" onclick="nextSlide()" aria-label="Next Slide">
+            <span id="slideshow-counter">1 of 1</span> &rarr;
+          </button>
+          
+          <button class="slideshow-close-btn" onclick="closeSlideshow()" aria-label="Close">back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUP9uKcggdBj9fr44bO6vkUZTug8uk1ao",
+      authDomain: "duchess-20a9a.firebaseapp.com",
+      databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com",
+      projectId: "duchess-20a9a",
+      storageBucket: "duchess-20a9a.firebasestorage.app",
+      messagingSenderId: "1007104387951",
+      appId: "1:1007104387951:web:65d51067c68f8f324b169a",
+      measurementId: "G-HV729TFY93"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let projectsData = [];
+    let currentProjectIndex = 0;
+    let currentSlideIndex = 0;
+
+    // Fetch dynamic projects from Firestore Database
+    async function fetchProjects() {
+      const container = document.getElementById('projects-list');
+      try {
+        const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        projectsData = [];
+        querySnapshot.forEach((doc) => {
+          projectsData.push({ id: doc.id, ...doc.data() });
+        });
+
+      } catch (e) {
+        console.warn("Firestore fetch error:", e);
+      }
+
+      renderProjects();
+    }
+
+    // Render list dynamically with clean stacked metadata
+    function renderProjects() {
+      const container = document.getElementById('projects-list');
+      container.innerHTML = "";
+
+      if (projectsData.length === 0) {
+        container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No projects added yet.</p>`;
+        return;
+      }
+
+      projectsData.forEach((project, pIndex) => {
+        const slides = project.slides || [];
+        const slideCount = slides.length || 1;
+        const thumbUrl = project.thumbnailUrl || (slides[0] ? (slides[0].pdfUrl || slides[0].url) : '');
+
+        // Scope tags HTML generation
+        const scopeTagsHtml = Array.isArray(project.scope) 
+          ? project.scope.map(tag => `<span class="scope-tag">${tag}</span>`).join('')
+          : '';
+
+        const card = document.createElement('article');
+        card.className = 'project-card';
+        card.innerHTML = `
+          <div class="project-media-col">
+            <div class="project-preview" onclick="openSlideshow(${pIndex}, 0)">
+              <img src="${thumbUrl}" alt="${project.title || 'Project preview'}">
+            </div>
+            <div class="image-counter" onclick="openSlideshow(${pIndex}, 0)">1 of ${slideCount} &rarr;</div>
+          </div>
+
+          <div class="project-meta">
+            <div class="project-date">${project.date || project.year || ''}</div>
+            <h2 class="project-title">${project.title || ''}</h2>
+            
+            <div class="project-meta-stack">
+              ${project.artist ? `<div class="project-meta-item">${project.artist}</div>` : ''}
+              ${project.label ? `<div class="project-meta-item">${project.label}</div>` : ''}
+            </div>
+
+            <div class="project-body">
+              <p>${project.description || project.caption || ''}</p>
+            </div>
+            
+            ${scopeTagsHtml ? `<div class="scope-tags">${scopeTagsHtml}</div>` : ''}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Open Modal
+    window.openSlideshow = function(projectIndex, slideIndex = 0) {
+      if (!projectsData[projectIndex]) return;
+      
+      currentProjectIndex = projectIndex;
+      currentSlideIndex = slideIndex;
+      
+      const project = projectsData[currentProjectIndex];
+      document.getElementById('slideshow-proj-title').innerText = project.title || '';
+
+      updateSlideshowContent();
+      const overlay = document.getElementById('slideshow-overlay');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Close Modal
+    window.closeSlideshow = function() {
+      const overlay = document.getElementById('slideshow-overlay');
+      overlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      document.getElementById('slideshow-media-col').innerHTML = "";
+      document.getElementById('slideshow-text-col').innerHTML = "";
+    };
+
+    // Render slide media (Left) and ONLY the slide caption (Right)
+    function updateSlideshowContent() {
+      const project = projectsData[currentProjectIndex];
+      const slides = project.slides || [];
+      
+      if (!slides.length) return;
+
+      const currentSlide = slides[currentSlideIndex];
+      const mediaCol = document.getElementById('slideshow-media-col');
+      const textCol = document.getElementById('slideshow-text-col');
+      const counterElem = document.getElementById('slideshow-counter');
+
+      const url = typeof currentSlide === 'string' ? currentSlide : (currentSlide.pdfUrl || currentSlide.url || '');
+      
+      // Strict slide-only caption check (no fallback to overall project description)
+      const slideCaption = typeof currentSlide === 'object' ? (currentSlide.caption || '') : '';
+
+      const isPdf = url.toLowerCase().includes('.pdf');
+
+      // Left Column: PDF iframe or Image
+      mediaCol.innerHTML = isPdf 
+        ? `<iframe class="slideshow-media" src="${url}#toolbar=0" frameborder="0"></iframe>`
+        : `<img class="slideshow-media" src="${url}" alt="Slide image" />`;
+
+      // Right Column: Render caption only if the slide has one
+      textCol.innerHTML = slideCaption 
+        ? `<p style="font-size: 13px; line-height: 1.6; color: #222222;">${slideCaption}</p>` 
+        : '';
+
+      counterElem.innerText = `${currentSlideIndex + 1} of ${slides.length}`;
+    }
+
+    // Controls
+    window.nextSlide = function() {
+      const project = projectsData[currentProjectIndex];
+      const slides = project.slides || [];
+      if (!slides.length) return;
+
+      currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+      updateSlideshowContent();
+    };
+
+    window.prevSlide = function() {
+      const project = projectsData[currentProjectIndex];
+      const slides = project.slides || [];
+      if (!slides.length) return;
+
+      currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+      updateSlideshowContent();
+    };
+
+    window.handleOverlayClick = function(e) {
+      if (e.target.id === 'slideshow-overlay') {
+        window.closeSlideshow();
+      }
+    };
+
+    document.addEventListener('keydown', function(e) {
+      const overlay = document.getElementById('slideshow-overlay');
+      if (!overlay.classList.contains('active')) return;
+
+      if (e.key === 'Escape') window.closeSlideshow();
+      if (e.key === 'ArrowRight') window.nextSlide();
+      if (e.key === 'ArrowLeft') window.prevSlide();
+    });
+
+    document.addEventListener('DOMContentLoaded', fetchProjects);
+  </script>
+
+</body>
+</html>
