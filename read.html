@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>duchess read</title>
+
+  <!-- Site Tab Logo -->
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compatibility SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --text-muted: #666666;
+      --bg-void: #ffffff;
+      --text-main: #000000;
+      --border-color: #e5e5e5;
+      
+      /* Glassy overlay matching projects.html */
+      --overlay-blue: rgba(189, 204, 212, 0.60);
+      
+      /* Soft box backdrop */
+      --soft-box-bg: #f5f5f7;
+      --soft-box-border: #e6e6ea;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: var(--text-main); 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Crect width='12' height='12' fill='%23bdccd4'/%3E%3C/svg%3E") 6 6, auto;
+    }
+
+    /* Navigation */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 24px; 
+      display: flex; 
+      align-items: center;
+      gap: 32px; 
+      z-index: 100; 
+    }
+    
+    .nav-item { 
+      text-decoration: none; 
+      display: flex;
+      align-items: center;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+    }
+
+    .nav-item img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+
+    /* Page Container */
+    .read-container {
+      width: 100%;
+      max-width: 760px;
+      margin: calc(20vh + 38px) auto 12vh auto;
+      padding: 0 24px;
+    }
+
+    .article-list {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    /* Article Card */
+    .read-card {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 32px;
+      align-items: start;
+      cursor: pointer;
+    }
+
+    .read-media-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Thumbnail Preview */
+    .read-preview {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #f7f7f7;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .read-card:hover .read-preview {
+      opacity: 0.92;
+      transform: scale(1.01);
+    }
+
+    .read-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+    }
+
+    /* Article Metadata */
+    .read-meta {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Host Grotesk', sans-serif;
+    }
+
+    .read-date-author {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .read-title {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    .read-excerpt {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #222222;
+      font-weight: 400;
+    }
+
+    /* Glassy Overlay Modal */
+    .read-overlay {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      right: 30px;
+      bottom: 30px;
+      width: calc(100vw - 60px);
+      height: calc(100vh - 60px);
+      background: var(--overlay-blue);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .read-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Inner Card Soft Box */
+    .article-modal-box {
+      background: var(--soft-box-bg);
+      border: 1px solid var(--soft-box-border);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+      width: 90%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 32px 36px;
+    }
+
+    .article-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .article-modal-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+      font-weight: 400;
+    }
+
+    .modal-close-btn {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #111111;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      padding: 5px 16px;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.2px;
+    }
+
+    .modal-close-btn:hover {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.3);
+      color: #000000;
+    }
+
+    .article-modal-body {
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .article-modal-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .article-modal-body::-webkit-scrollbar-thumb {
+      background: #d1d1d6;
+      border-radius: 4px;
+    }
+
+    .article-modal-title {
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+    }
+
+    .article-modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    /* Content Body & Inline Images */
+    .article-content-text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: #222222;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .article-body-img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin: 6px 0;
+      display: block;
+      border: 1px solid var(--border-color);
+    }
+
+    .article-body-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 6px;
+    }
+
+    /* --- Comments Section --- */
+    .discourse-container {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .discourse-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .discourse-indicator {
+      width: 7px;
+      height: 7px;
+      background: #bdccd4;
+      border-radius: 50%;
+    }
+
+    .discourse-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: lowercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+    }
+
+    .chat-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .chat-bubble {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .chat-bubble:hover {
+      background: #ffffff;
+    }
+
+    .chat-reply-bubble {
+      margin-left: 18px;
+      margin-top: 6px;
+      border-left: 2px solid #bdccd4;
+      background: rgba(250, 250, 252, 0.9);
+    }
+
+    .chat-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .chat-handle {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .chat-timestamp {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .chat-message-text {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #222222;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .chat-reply-trigger {
+      align-self: flex-start;
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-top: 2px;
+      padding: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .chat-reply-trigger:hover {
+      color: #000000;
+      text-decoration: underline;
+    }
+
+    .chat-input-wrapper {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chat-author-input {
+      font-family: inherit;
+      font-size: 11px;
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      outline: none;
+      background: #ffffff;
+      width: 140px;
+    }
+
+    .chat-author-input:focus, .chat-textarea-input:focus {
+      border-color: #bdccd4;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-textarea-input {
+      flex: 1;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      outline: none;
+      background: #ffffff;
+      resize: none;
+      min-height: 38px;
+    }
+
+    .chat-send-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 38px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .chat-send-btn:hover {
+      background: #333333;
+    }
+
+    .reply-box-container {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-header-bar { top: 25px; left: 16px; gap: 16px; }
+      .nav-item img { height: 28px; }
+      .read-container { margin: calc(120px + 28px) auto 12vh auto; padding: 0 16px; }
+      .read-card { grid-template-columns: 1fr; gap: 20px; }
+      .read-overlay { top: 16px; left: 16px; right: 16px; bottom: 16px; width: calc(100vw - 32px); height: calc(100vh - 32px); }
+      .article-modal-box { padding: 24px; }
+      .chat-author-input { width: 100%; }
+      .chat-input-row { flex-direction: column; }
+      .chat-send-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item"><img src="info.png" alt="info"></a>
+    <a href="projects.html" class="nav-item"><img src="projects.png" alt="projects"></a>
+    <a href="blog.html" class="nav-item"><img src="blog.png" alt="blog"></a>
+    <a href="read.html" class="nav-item active"><img src="read.png" alt="read"></a>
+    <a href="radio.html" class="nav-item"><img src="radio.png" alt="radio"></a>
+    <a href="contact.html" class="nav-item"><img src="contact.png" alt="contact"></a>
+  </header>
+
+  <main class="read-container">
+    <div class="article-list" id="article-list">
+      <p style="font-size: 13px; color: var(--text-muted);">Loading articles...</p>
+    </div>
+  </main>
+
+  <!-- Glassy Overlay Modal -->
+  <div class="read-overlay" id="article-overlay" onclick="handleOverlayClick(event)">
+    <div class="article-modal-box">
+      
+      <div class="article-modal-header">
+        <span class="article-modal-date" id="article-date"></span>
+        <button class="modal-close-btn" onclick="closeArticleModal()">back</button>
+      </div>
+
+      <div class="article-modal-body">
+        <h1 class="article-modal-title" id="article-title">Loading...</h1>
+        <div class="article-modal-subtitle" id="article-subtitle"></div>
+
+        <div class="article-content-text" id="article-body"></div>
+
+        <!-- Comments Section -->
+        <div class="discourse-container">
+          <div class="discourse-header-row">
+            <div class="discourse-indicator"></div>
+            <div class="discourse-title">comments</div>
+          </div>
+
+          <div class="chat-stream" id="chat-stream">
+            <p style="font-size: 11px; color: var(--text-muted);">Loading comments...</p>
+          </div>
+
+          <!-- Comment Input -->
+          <div class="chat-input-wrapper">
+            <input type="text" id="chat-author" class="chat-author-input" placeholder="user" maxlength="24">
+            <div class="chat-input-row">
+              <textarea id="chat-text" class="chat-textarea-input" rows="1" placeholder="Leave a comment..."></textarea>
+              <button class="chat-send-btn" onclick="postChatMessage(null)">Send</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 1. Firebase Setup
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "duchess-20a9a.firebaseapp.com",
+      projectId: "duchess-20a9a",
+      storageBucket: "duchess-20a9a.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let articlesData = [];
+    let currentArticleId = null;
+
+    // 2. Fetch Articles
+    async function fetchArticles() {
+      const container = document.getElementById('article-list');
+
+      try {
+        const snapshot = await db.collection("articles").get();
+        articlesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        if (articlesData.length === 0) {
+          container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No articles found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        articlesData.forEach((article, index) => {
+          const author = article.author || "";
+          const date = article.date || "";
+          const thumbUrl = article.thumbnailUrl || "";
+
+          const card = document.createElement('article');
+          card.className = 'read-card';
+          card.onclick = () => openArticleModal(index);
+          
+          card.innerHTML = `
+            <div class="read-media-col">
+              <div class="read-preview">
+                ${thumbUrl ? `<img src="${thumbUrl}" loading="lazy" alt="${article.title || 'Article thumbnail'}">` : ''}
+              </div>
+            </div>
+            <div class="read-meta">
+              <div class="read-date-author">${date}${date && author ? ' — ' : ''}${author}</div>
+              <h2 class="read-title">${article.title || 'Untitled'}</h2>
+              <p class="read-excerpt">${article.byline || article.subtitle || ''}</p>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error("Firestore fetch error:", error);
+        container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">Error loading articles.</p>`;
+      }
+    }
+
+    // 3. Open Modal
+    function openArticleModal(index) {
+      const article = articlesData[index];
+      if (!article) return;
+
+      currentArticleId = article.id;
+
+      const overlay = document.getElementById('article-overlay');
+      const titleElem = document.getElementById('article-title');
+      const dateElem = document.getElementById('article-date');
+      const subtitleElem = document.getElementById('article-subtitle');
+      const bodyElem = document.getElementById('article-body');
+
+      const author = article.author || "";
+      const date = article.date || "";
+
+      titleElem.innerText = article.title || "Untitled Article";
+      dateElem.innerText = `${date}${date && author ? ' — ' : ''}${author}`;
+      subtitleElem.innerText = article.byline || article.subtitle || "";
+
+      // Render Body Elements
+      if (Array.isArray(article.body)) {
+        bodyElem.innerHTML = article.body.map(item => {
+          if (typeof item === 'string') {
+            return `<p>${item}</p>`;
+          } else if (typeof item === 'object' && item !== null) {
+            if (item.type === 'image' || item.url) {
+              const captionHtml = item.caption ? `<div class="article-body-caption">${item.caption}</div>` : '';
+              return `<img class="article-body-img" src="${item.url}" alt="${item.caption || 'Article image'}" />${captionHtml}`;
+            }
+          }
+          return '';
+        }).join('');
+      } else if (typeof article.body === 'string') {
+        bodyElem.innerHTML = `<p>${article.body}</p>`;
+      } else {
+        bodyElem.innerHTML = `<p>No content available.</p>`;
+      }
+
+      loadChatStream(currentArticleId);
+
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 4. Load Comments
+    async function loadChatStream(articleId) {
+      const streamContainer = document.getElementById('chat-stream');
+      streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">Loading comments...</p>`;
+
+      try {
+        const snapshot = await db.collection('articles')
+          .doc(articleId)
+          .collection('comments')
+          .orderBy('createdAt', 'asc')
+          .get();
+
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderChatMessages(messages);
+      } catch (err) {
+        console.error("Chat fetch error:", err);
+        streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">Unable to load comments.</p>`;
+      }
+    }
+
+    function renderChatMessages(messages) {
+      const streamContainer = document.getElementById('chat-stream');
+      streamContainer.innerHTML = '';
+
+      if (messages.length === 0) {
+        streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">comments</p>`;
+        return;
+      }
+
+      const parentMsgs = messages.filter(m => !m.parentId);
+      const replyMsgs = messages.filter(m => m.parentId);
+
+      parentMsgs.forEach(parent => {
+        const bubble = createChatBubble(parent, false);
+        
+        const nested = replyMsgs.filter(r => r.parentId === parent.id);
+        nested.forEach(reply => {
+          const replyBubble = createChatBubble(reply, true);
+          bubble.appendChild(replyBubble);
+        });
+
+        streamContainer.appendChild(bubble);
+      });
+    }
+
+    function createChatBubble(msg, isReply = false) {
+      const bubble = document.createElement('div');
+      bubble.className = isReply ? 'chat-bubble chat-reply-bubble' : 'chat-bubble';
+
+      let timeStr = '';
+      if (msg.createdAt && msg.createdAt.toDate) {
+        const dateObj = msg.createdAt.toDate();
+        timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      bubble.innerHTML = `
+        <div class="chat-meta">
+          <span class="chat-handle">${msg.author || 'user'}</span>
+          <span class="chat-timestamp">${timeStr}</span>
+        </div>
+        <div class="chat-message-text">${msg.text || ''}</div>
+        ${!isReply ? `<button class="chat-reply-trigger" onclick="toggleReplyBox('${msg.id}')">&rdsh; reply</button>` : ''}
+        <div id="reply-box-${msg.id}" class="reply-box-container"></div>
+      `;
+
+      return bubble;
+    }
+
+    // 5. Toggle Inline Reply Box
+    function toggleReplyBox(parentId) {
+      const container = document.getElementById(`reply-box-${parentId}`);
+      if (container.innerHTML !== '') {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="chat-input-wrapper" style="margin-top: 6px;">
+          <input type="text" id="reply-author-${parentId}" class="chat-author-input" placeholder="user" maxlength="24">
+          <div class="chat-input-row">
+            <textarea id="reply-text-${parentId}" class="chat-textarea-input" rows="1" placeholder="Reply..."></textarea>
+            <button class="chat-send-btn" onclick="postChatMessage('${parentId}')">Reply</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. Post Comment
+    async function postChatMessage(parentId = null) {
+      if (!currentArticleId) return;
+
+      const authorInput = parentId ? document.getElementById(`reply-author-${parentId}`) : document.getElementById('chat-author');
+      const textInput = parentId ? document.getElementById(`reply-text-${parentId}`) : document.getElementById('chat-text');
+
+      const author = authorInput.value.trim() || 'user';
+      const text = textInput.value.trim();
+
+      if (!text) return;
+
+      try {
+        await db.collection('articles')
+          .doc(currentArticleId)
+          .collection('comments')
+          .add({
+            author: author,
+            text: text,
+            parentId: parentId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        authorInput.value = '';
+        textInput.value = '';
+
+        loadChatStream(currentArticleId);
+      } catch (err) {
+        console.error("Error posting comment:", err);
+      }
+    }
+
+    function closeArticleModal() {
+      const overlay = document.getElementById('article-overlay');
+      overlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      currentArticleId = null;
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'article-overlay') {
+        closeArticleModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeArticleModal();
+    });
+
+    window.addEventListener('DOMContentLoaded', fetchArticles);
+  </script>
+
+</body>
+</html>
