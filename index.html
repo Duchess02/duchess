@@ -73,7 +73,7 @@
     /* Splash Cycling Greeting Headline */
     #splash-greeting {
       font-family: 'Host Grotesk', sans-serif;
-      font-size: 5.85rem;
+      font-size: 8.75rem;
       font-weight: 300;
       font-variation-settings: 'wght' 200;
       color: #1a1a1a;
@@ -116,28 +116,48 @@
       color: rgba(255, 255, 255, 0.85);
     }
 
-    .splash-slide-text {
-      position: absolute;
-      bottom: 8%;
-      font-family: 'Host Grotesk', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 300;
-      font-variation-settings: 'wght' 200;
-      color: #888888;
-      letter-spacing: -0.01em;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
-      animation: splashPulse 2.5s infinite ease-in-out;
-    }
+.splash-slide-text {
+  position: absolute;
+  /* Dynamically offsets prompt above mobile browser address bars */
+  bottom: max(40px, calc(5vh + env(safe-area-inset-bottom))); 
+  
+  font-family: 'Host Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  font-variation-settings: 'wght' 300;
+  letter-spacing: -0.01em;
+  z-index: 10002;
+  text-align: center;
+  width: 100%;
+  padding: 0 1rem;
+  pointer-events: none;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  
+  /* Subtle Pale Rainbow Gradient Text */
+  background: linear-gradient(
+    90deg, 
+    #ffc0cb, 
+    #ffe4b5, 
+    #e6e6fa, 
+    #b2fba5, 
+    #87cefa, 
+    #dda0dd, 
+    #ffc0cb
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 
-    #ios-splash.dismissed .splash-slide-text {
-      opacity: 0;
-      visibility: hidden;
-    }
+  /* Combines rainbow gradient flow with the gentle pulse fade */
+  animation: rainbowShift 8s linear infinite, splashPulse 2.5s infinite ease-in-out;
+}
 
-    @keyframes splashPulse {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 0.25; }
-    }
+@keyframes rainbowShift {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
 
     /* Left Navigation Header */
     .nav-header-bar { 
