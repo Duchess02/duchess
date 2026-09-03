@@ -70,7 +70,7 @@
       padding: 0 1rem;
     }
 
-    /* Splash Cycling Greeting Headline (Scaled 30% Larger) */
+    /* Splash Cycling Greeting Headline */
     #splash-greeting {
       font-family: 'Host Grotesk', sans-serif;
       font-size: 5.85rem;
@@ -87,7 +87,7 @@
       opacity: 0;
     }
 
-    /* Integrated Minimal Metadata Row (Smaller, White, Thinner) */
+    /* Integrated Minimal Metadata Row */
     #hero-clock-meta {
       display: flex;
       align-items: center;
@@ -108,7 +108,6 @@
       font-size: 0.65rem;
     }
 
-    /* Morph title text to cream white when dismissed against void black background */
     #ios-splash.dismissed #splash-greeting {
       color: #fff6e2;
     }
@@ -176,12 +175,12 @@
       pointer-events: none; 
     }
 
-    /* Top Right About Nav */
+    /* Top Right About Nav - Elevated above splash overlay */
     .about-top-right {
       position: absolute;
       top: 40px;
       right: 24px;
-      z-index: 100;
+      z-index: 10000;
       display: flex;
       align-items: center;
     }
@@ -200,27 +199,27 @@
       display: block;
     }
 
-    /* Cream Translucent Window */
+    /* Cream Translucent Window - Highest priority z-index */
     .about-popup-window {
       position: absolute;
       top: 50px;
       right: 0;
       width: 360px;
       max-height: 80vh;
-      background: rgba(255, 246, 226, 0.14);
+      background: rgba(20, 20, 20, 0.75); /* Darker backdrop blur for high-contrast mobile readability */
       border: 1px solid rgba(255, 246, 226, 0.35);
       color: #fff6e2;
       padding: 22px;
       border-radius: 14px;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
       opacity: 0;
       pointer-events: none;
       transform: scale(0.95);
       transform-origin: top right;
       transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 200;
+      z-index: 10001;
       overflow-y: auto;
       font-family: 'Host Grotesk', sans-serif;
     }
@@ -331,45 +330,19 @@
       font-family: 'Host Grotesk', sans-serif;
     }
 
-    /* Scattered Positions & Specific Lower Opacity Palette */
-    .popover-projects { 
-      top: 22vh; 
-      left: 32vw; 
-      background: rgba(189, 204, 212, 0.14); 
-      border: 1px solid rgba(189, 204, 212, 0.35); 
-    }
+    .popover-projects { top: 22vh; left: 32vw; background: rgba(189, 204, 212, 0.14); border: 1px solid rgba(189, 204, 212, 0.35); }
     .popover-projects .popover-title { color: #bdccd4; }
 
-    .popover-blog { 
-      top: 15vh; 
-      right: 12vw; 
-      background: rgba(255, 123, 172, 0.14); 
-      border: 1px solid rgba(255, 123, 172, 0.35); 
-    }
+    .popover-blog { top: 15vh; right: 12vw; background: rgba(255, 123, 172, 0.14); border: 1px solid rgba(255, 123, 172, 0.35); }
     .popover-blog .popover-title { color: #ff7bac; }
 
-    .popover-read { 
-      top: 42vh; 
-      left: 18vw; 
-      background: rgba(235, 31, 37, 0.14); 
-      border: 1px solid rgba(235, 31, 37, 0.35); 
-    }
+    .popover-read { top: 42vh; left: 18vw; background: rgba(235, 31, 37, 0.14); border: 1px solid rgba(235, 31, 37, 0.35); }
     .popover-read .popover-title { color: #eb1f25; }
 
-    .popover-radio { 
-      top: 32vh; 
-      right: 22vw; 
-      background: rgba(63, 169, 245, 0.14); 
-      border: 1px solid rgba(63, 169, 245, 0.35); 
-    }
+    .popover-radio { top: 32vh; right: 22vw; background: rgba(63, 169, 245, 0.14); border: 1px solid rgba(63, 169, 245, 0.35); }
     .popover-radio .popover-title { color: #3fa9f5; }
 
-    .popover-contact { 
-      top: 52vh; 
-      right: 10vw; 
-      background: rgba(255, 147, 30, 0.14); 
-      border: 1px solid rgba(255, 147, 30, 0.35); 
-    }
+    .popover-contact { top: 52vh; right: 10vw; background: rgba(255, 147, 30, 0.14); border: 1px solid rgba(255, 147, 30, 0.35); }
     .popover-contact .popover-title { color: #ff931e; }
 
     /* Layout Alignment */
@@ -477,13 +450,13 @@
         gap: 6px;
       }
 
-      /* Pin About button & modal to bottom right on mobile */
+      /* Pin About button & modal to bottom right on mobile with top z-index layer */
       .about-top-right {
         position: fixed;
         top: auto;
         bottom: 25px;
         right: 16px;
-        z-index: 200;
+        z-index: 10000;
       }
 
       .about-btn img { 
@@ -499,6 +472,7 @@
         max-width: 320px;
         max-height: 60vh;
         transform-origin: bottom right;
+        z-index: 10001;
       }
 
       .left-editorial-column {
@@ -533,7 +507,6 @@
   </div>
 
   <header class="nav-header-bar">
-    
     <div class="nav-item-wrapper">
       <a href="index.html" class="nav-item active"><img src="info2.png" alt="info"></a>
     </div>
@@ -577,10 +550,8 @@
         <p class="popover-desc">Connect with us for new business, inquires, or just 2 say hi.</p>
       </div>
     </div>
-
   </header>
 
-  <!-- Top Right Corner About Tab (Floating Bottom Right on Mobile) -->
   <div class="about-top-right">
     <button class="about-btn" id="about-toggle" aria-label="About Duchess">
       <img src="about.png" alt="about">
@@ -631,7 +602,6 @@
   </div>
 
   <script>
-    // Continuous Multilingual Looping & Seamless Color Transition
     document.addEventListener("DOMContentLoaded", () => {
       const splashOverlay = document.getElementById('ios-splash');
       const splashGreetingEl = document.getElementById('splash-greeting');
@@ -639,19 +609,18 @@
       if (!splashOverlay || !splashGreetingEl) return;
 
       const splashLanguages = [
-        "duchess",         // English
-        "iako'tiiá:ner",   // Mohawk
-        "دوقة",            // Arabic
-        "公爵夫人",        // Mandarin
-        "डचेस",           // Hindi
-        "公爵夫人",        // Japanese
-        "ഡച്ചസ്",          // Malayalam
-        "공작부인"         // Korean
+        "duchess",
+        "iako'tiiá:ner",
+        "دوقة",
+        "公爵夫人",
+        "डचेस",
+        "公爵夫人",
+        "ഡച്ചസ്",
+        "공작부인"
       ];
 
       let splashIndex = 0;
 
-      // Continuous loop across languages
       setInterval(() => {
         splashGreetingEl.classList.add('fade-out');
 
@@ -662,7 +631,6 @@
         }, 600);
       }, 2800);
 
-      // Session Storage Persistence Check
       if (localStorage.getItem('hasSeenDuchessSplash') === 'true') {
         splashOverlay.classList.add('dismissed');
       } else {
@@ -690,7 +658,6 @@
       }
     });
 
-    // About Window Toggle Logic
     const aboutToggle = document.getElementById('about-toggle');
     const aboutWindow = document.getElementById('about-window');
     const aboutClose = document.getElementById('about-close');
@@ -709,7 +676,6 @@
       });
     }
 
-    // Live Clock & Date Stream Logic
     function refreshClock() {
       const now = new Date();
       const timeElem = document.getElementById('live-time');
@@ -721,7 +687,6 @@
     setInterval(refreshClock, 1000);
     refreshClock();
 
-    // Last.fm Logic
     async function streamMusicData() {
       const apiKey = '3d6237a6791e154201820a0cf2f60f61';
       const username = 'khizerthewzrd';
@@ -762,7 +727,6 @@
     streamMusicData();
     setInterval(streamMusicData, 30000);
 
-    // Draggable Logic
     const dragItem = document.getElementById("draggable-music");
     let active = false;
     let currentX = 0, currentY = 0, initialX = 0, initialY = 0;
