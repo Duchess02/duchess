@@ -35,7 +35,7 @@
       font-family: 'Host Grotesk', sans-serif;
     }
 
-    /* Fullscreen OOBE Apple Splash Screen Overlay */
+    /* Fullscreen Apple Splash Overlay & Center Hero Stack */
     #ios-splash {
       position: fixed;
       top: 0;
@@ -48,56 +48,91 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transition: background-color 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s cubic-bezier(0.16, 1, 0.3, 1), visibility 1s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background-color 1.2s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    #ios-splash.dismissing {
+    /* Dismissed State: Background fades to transparent, enabling click-throughs */
+    #ios-splash.dismissed {
       background-color: transparent;
-      opacity: 0;
-      visibility: hidden;
       pointer-events: none;
     }
 
+    .hero-center-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    /* Splash Cycling Greeting Headline (Scaled 30% Larger) */
     #splash-greeting {
       font-family: 'Host Grotesk', sans-serif;
-      font-size: 4.5rem;
+      font-size: 5.85rem;
       font-weight: 300;
       font-variation-settings: 'wght' 200;
       color: #1a1a1a;
       letter-spacing: -0.03em;
-      transition: color 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-in-out;
+      transition: color 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-in-out;
       opacity: 1;
-      text-align: center;
-      padding: 0 1rem;
+      line-height: 1;
     }
 
     #splash-greeting.fade-out {
       opacity: 0;
     }
 
-    /* Smoothly morph text from dark black to cream white as the background fades into void black */
-    #ios-splash.dismissing #splash-greeting {
+    /* Integrated Minimal Metadata Row (Smaller, White, Thinner) */
+    #hero-clock-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 300;
+      font-variation-settings: 'wght' 200;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffffff;
+      transition: color 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .meta-divider {
+      opacity: 0.5;
+      font-size: 0.65rem;
+    }
+
+    /* Morph title text to cream white when dismissed against void black background */
+    #ios-splash.dismissed #splash-greeting {
       color: #fff6e2;
+    }
+
+    #ios-splash.dismissed #hero-clock-meta {
+      color: rgba(255, 255, 255, 0.85);
     }
 
     .splash-slide-text {
       position: absolute;
-      bottom: 10%;
+      bottom: 8%;
       font-family: 'Host Grotesk', sans-serif;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 300;
       font-variation-settings: 'wght' 200;
       color: #888888;
       letter-spacing: -0.01em;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
       animation: splashPulse 2.5s infinite ease-in-out;
     }
 
-    #ios-splash.dismissing .splash-slide-text {
+    #ios-splash.dismissed .splash-slide-text {
       opacity: 0;
+      visibility: hidden;
     }
 
     @keyframes splashPulse {
@@ -347,11 +382,12 @@
       display: flex; 
       flex-direction: column; 
       justify-content: flex-end; 
+      pointer-events: none;
     }
 
     .bottom-dock-alignment-row { 
       display: flex; 
-      justify-content: space-between; 
+      justify-content: flex-start; 
       align-items: flex-end; 
       width: 100%; 
       padding-bottom: 20px; 
@@ -369,6 +405,7 @@
       z-index: 10;
       will-change: transform;
       font-family: 'Host Grotesk', sans-serif;
+      pointer-events: auto;
     }
 
     .embed-1-3-music:active {
@@ -421,51 +458,6 @@
       font-family: 'Host Grotesk', sans-serif;
     }
 
-    /* Clock & Location Window */
-    .clock-coordinates-window { 
-      background: rgba(255, 246, 226, 0.14); 
-      border: 1px solid rgba(255, 246, 226, 0.35); 
-      padding: 16px 20px; 
-      border-radius: 14px; 
-      backdrop-filter: blur(24px); 
-      -webkit-backdrop-filter: blur(24px); 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7); 
-      text-align: right; 
-      color: var(--text-grey); 
-      font-family: 'Host Grotesk', sans-serif; 
-      user-select: none;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      min-width: 170px;
-    }
-
-    .clock-location {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      opacity: 0.45;
-      font-family: 'Host Grotesk', sans-serif;
-    }
-
-    #live-time {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      line-height: 1.25;
-      color: var(--text-grey);
-      font-family: 'Host Grotesk', sans-serif;
-    }
-
-    #live-date {
-      font-size: 13px;
-      font-weight: 400;
-      opacity: 0.65;
-      letter-spacing: -0.01em;
-      font-family: 'Host Grotesk', sans-serif;
-    }
-	
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .nav-header-bar {
@@ -475,6 +467,15 @@
       }
       .nav-item img { height: 28px; }
       .apple-popover { display: none; }
+
+      #splash-greeting {
+        font-size: 3.9rem;
+      }
+
+      #hero-clock-meta {
+        font-size: 0.62rem;
+        gap: 6px;
+      }
 
       /* Pin About button & modal to bottom right on mobile */
       .about-top-right {
@@ -509,26 +510,25 @@
       }
 
       .bottom-dock-alignment-row {
-        flex-direction: column-reverse;
-        align-items: flex-start;
-        gap: 30px;
-        margin-top: 40px;
-        padding-bottom: 90px; /* Clears floating action button on mobile */
+        padding-bottom: 90px;
       }
-
-      .clock-coordinates-window {
-        text-align: left;
-      }
-      #live-time { font-size: 18px !important; }
-      #live-date { font-size: 12px !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Fullscreen Apple-Style Splash Screen Overlay -->
+  <!-- Persistent Cycling Headline & Stacked Location/Time Metadata -->
   <div id="ios-splash">
-    <div id="splash-greeting">duchess</div>
+    <div class="hero-center-stack">
+      <div id="splash-greeting">duchess</div>
+      <div id="hero-clock-meta">
+        <span>TORONTO, ON</span>
+        <span class="meta-divider">•</span>
+        <span id="live-time"></span>
+        <span class="meta-divider">•</span>
+        <span id="live-date"></span>
+      </div>
+    </div>
     <div class="splash-slide-text">› click or swipe to enter</div>
   </div>
 
@@ -627,64 +627,49 @@
           <span class="music-artist" id="music-artist"></span>
         </div>
       </div>
-
-      <div class="clock-coordinates-window">
-        <span class="clock-location">TORONTO, ON</span>
-        <p id="live-time"></p>
-        <p id="live-date"></p>
-      </div>
     </div>
   </div>
 
   <script>
-    // -------------------------------------------------------------
-    // Fullscreen Apple-Style Splash Screen & Smooth Transition Logic
-    // -------------------------------------------------------------
+    // Continuous Multilingual Looping & Seamless Color Transition
     document.addEventListener("DOMContentLoaded", () => {
       const splashOverlay = document.getElementById('ios-splash');
       const splashGreetingEl = document.getElementById('splash-greeting');
 
       if (!splashOverlay || !splashGreetingEl) return;
 
+      const splashLanguages = [
+        "duchess",         // English
+        "iako'tiiá:ner",   // Mohawk
+        "دوقة",            // Arabic
+        "公爵夫人",        // Mandarin
+        "डचेस",           // Hindi
+        "公爵夫人",        // Japanese
+        "ഡച്ചസ്",          // Malayalam
+        "공작부인"         // Korean
+      ];
+
+      let splashIndex = 0;
+
+      // Continuous loop across languages
+      setInterval(() => {
+        splashGreetingEl.classList.add('fade-out');
+
+        setTimeout(() => {
+          splashIndex = (splashIndex + 1) % splashLanguages.length;
+          splashGreetingEl.textContent = splashLanguages[splashIndex];
+          splashGreetingEl.classList.remove('fade-out');
+        }, 600);
+      }, 2800);
+
+      // Session Storage Persistence Check
       if (localStorage.getItem('hasSeenDuchessSplash') === 'true') {
-        splashOverlay.style.display = 'none';
+        splashOverlay.classList.add('dismissed');
       } else {
-        const splashLanguages = [
-          "duchess",         // English
-          "iako'tiiá:ner",   // Mohawk
-          "دوقة",            // Arabic
-          "公爵夫人",        // Mandarin
-          "डचेस",           // Hindi
-          "公爵夫人",        // Japanese
-          "ഡച്ചസ്",          // Malayalam
-          "공작부인"         // Korean
-        ];
-
-        let splashIndex = 0;
-
-        // Continuous language looping
-        const splashCycle = setInterval(() => {
-          splashGreetingEl.classList.add('fade-out');
-
-          setTimeout(() => {
-            splashIndex = (splashIndex + 1) % splashLanguages.length;
-            splashGreetingEl.textContent = splashLanguages[splashIndex];
-            splashGreetingEl.classList.remove('fade-out');
-          }, 600);
-        }, 2800);
-
-        // Smooth dismissal transition
         const dismissSplash = () => {
-          if (splashOverlay.classList.contains('dismissing')) return;
-
-          // Trigger CSS smooth color transition (dark -> cream) and background fade to void black
-          splashOverlay.classList.add('dismissing');
+          if (splashOverlay.classList.contains('dismissed')) return;
+          splashOverlay.classList.add('dismissed');
           localStorage.setItem('hasSeenDuchessSplash', 'true');
-
-          setTimeout(() => {
-            clearInterval(splashCycle);
-            splashOverlay.style.display = 'none';
-          }, 1000);
         };
 
         splashOverlay.addEventListener('click', dismissSplash);
@@ -724,14 +709,17 @@
       });
     }
 
-    // Clock Logic
-    function refresh() {
+    // Live Clock & Date Stream Logic
+    function refreshClock() {
       const now = new Date();
-      document.getElementById('live-time').innerText = now.toLocaleTimeString();
-      document.getElementById('live-date').innerText = now.toLocaleDateString();
+      const timeElem = document.getElementById('live-time');
+      const dateElem = document.getElementById('live-date');
+
+      if (timeElem) timeElem.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (dateElem) dateElem.innerText = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
     }
-    setInterval(refresh, 1000);
-    refresh();
+    setInterval(refreshClock, 1000);
+    refreshClock();
 
     // Last.fm Logic
     async function streamMusicData() {
