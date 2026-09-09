@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>duchess read</title>
+
+  <!-- Site Tab Logo -->
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compatibility SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --text-muted: #666666;
+      --bg-void: #ffffff;
+      --text-main: #000000;
+      --border-color: #e5e5e5;
+      
+      /* Glassy overlay matching projects.html */
+      --overlay-blue: rgba(189, 204, 212, 0.60);
+      
+      /* Soft box backdrop */
+      --soft-box-bg: #f5f5f7;
+      --soft-box-border: #e6e6ea;
+
+      /* Accent Red */
+      --duchess-red: #eb1f25;
+      --duchess-red-bg: rgba(235, 31, 37, 0.04);
+      --duchess-red-border: rgba(235, 31, 37, 0.22);
+      --duchess-red-soft: rgba(235, 31, 37, 0.12);
+      --duchess-red-hover: rgba(235, 31, 37, 0.25);
+      --duchess-red-text: #b3181c;
+    }
+
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      cursor: none !important; /* Replaced default cursor with custom red square */
+    }
+    
+    body { 
+      background-color: var(--bg-void); 
+      color: var(--text-main); 
+      font-family: 'Host Grotesk', sans-serif; 
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Soft Red Square Custom Cursor */
+    .custom-red-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 13px;
+      height: 13px;
+      background: rgba(235, 31, 37, 0.65);
+      border: 1px solid rgba(235, 31, 37, 0.85);
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out, width 0.15s ease, height 0.15s ease, background-color 0.15s ease;
+      backdrop-filter: blur(1px);
+    }
+
+    /* Interactive state for links and buttons */
+    body.cursor-hover .custom-red-cursor {
+      width: 18px;
+      height: 18px;
+      background: rgba(235, 31, 37, 0.85);
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Navigation */
+    .nav-header-bar { 
+      position: absolute; 
+      top: 40px; 
+      left: 24px; 
+      display: flex; 
+      align-items: center;
+      gap: 32px; 
+      z-index: 100; 
+    }
+    
+    .nav-item { 
+      text-decoration: none; 
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-item img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+
+    /* Page Container */
+    .read-container {
+      width: 100%;
+      max-width: 760px;
+      margin: calc(20vh + 38px) auto 12vh auto;
+      padding: 0 24px;
+    }
+
+    /* Submission Window Above Articles */
+    .submit-window {
+      width: 100%;
+      background: var(--duchess-red-bg);
+      border: 1px solid var(--duchess-red-border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(235, 31, 37, 0.03);
+    }
+
+    .submit-window-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      text-transform: lowercase;
+    }
+
+    .submit-tag {
+      font-weight: 600;
+      color: var(--duchess-red);
+    }
+
+    .submit-status {
+      color: rgba(235, 31, 37, 0.7);
+    }
+
+    .submit-window-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .submit-window-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--text-main);
+    }
+
+    .submit-piece-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      color: #ffffff;
+      background: var(--duchess-red);
+      border: 1px solid var(--duchess-red);
+      border-radius: 4px;
+      padding: 9px 18px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .submit-piece-btn:hover {
+      background: #c8171d;
+      border-color: #c8171d;
+    }
+
+    /* Pitch Modal — opens in place, doesn't navigate away from the site */
+    .modal-overlay {
+      display: none; /* set to flex via js */
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(255, 255, 255, 0.95); z-index: 2000;
+      justify-content: center; align-items: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border: 1px solid var(--text-main);
+      border-radius: 6px;
+      width: 90%; max-width: 600px; max-height: 85vh;
+      padding: 40px; overflow-y: auto; position: relative;
+    }
+
+    .modal-close-x {
+      position: absolute; top: 20px; right: 20px; color: var(--text-main);
+      background: none; border: none; font-size: 12px; font-family: 'Host Grotesk', sans-serif;
+      font-weight: 700; letter-spacing: 1px;
+      appearance: none; -webkit-appearance: none;
+    }
+    .modal-close-x:hover { opacity: 0.6; }
+
+    .pitch-modal-header {
+      margin-bottom: 30px;
+    }
+    .pitch-modal-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .pitch-modal-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* pitch form styles */
+    .form-section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .duchess-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--text-main);
+      color: var(--text-main);
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 13px;
+      padding: 8px 0;
+      outline: none;
+      width: 100%;
+      border-radius: 0;
+      margin-bottom: 16px;
+      transition: border-bottom-color 0.2s ease;
+    }
+    .duchess-input::placeholder {
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+    .duchess-input:focus {
+      border-bottom-color: var(--duchess-red);
+    }
+    textarea.duchess-input {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 20px;
+    }
+    .input-row .duchess-input {
+      flex: 1;
+    }
+
+    /* options grid (submission type, status, visuals) */
+    .options-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .option-card {
+      border: 1px solid var(--text-main);
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .option-card:hover {
+      background: #f5f5f5;
+    }
+    .option-card.selected {
+      background: var(--duchess-red-soft);
+      border-color: var(--duchess-red-text);
+      color: var(--duchess-red-text);
+    }
+
+    /* dynamic logic blocks */
+    .logic-block {
+      display: none;
+      margin-top: 16px;
+      padding-left: 16px;
+      border-left: 2px solid var(--text-main);
+    }
+    .logic-block.active {
+      display: block;
+      animation: pitchFadeIn 0.3s ease forwards;
+    }
+
+    @keyframes pitchFadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* pitch submit button & status */
+    .pitch-submit-btn {
+      background: var(--duchess-red-soft);
+      border: 1px solid var(--duchess-red-border);
+      color: var(--duchess-red-text);
+      font-family: 'Host Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 11px;
+      padding: 12px;
+      width: 100%;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      border-radius: 6px;
+      margin-top: 10px;
+      appearance: none; -webkit-appearance: none;
+    }
+    .pitch-submit-btn:hover {
+      background: var(--duchess-red-hover);
+    }
+    .pitch-submit-btn:disabled {
+      opacity: 0.5;
+    }
+
+    .pitch-form-status {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .pitch-form-status.error {
+      display: block;
+      background: rgba(235, 31, 37, 0.18);
+      border: 1px solid rgba(235, 31, 37, 0.4);
+      color: var(--duchess-red-text);
+      box-shadow: 0 4px 12px rgba(235, 31, 37, 0.12);
+    }
+    .pitch-form-status.success {
+      display: block;
+      background: var(--duchess-red-soft);
+      border: 1px solid var(--duchess-red-border);
+      color: var(--duchess-red-text);
+    }
+
+    @media (max-width: 600px) {
+      .input-row { flex-direction: column; gap: 0; }
+      .modal-content { padding: 30px 20px; width: 95%; }
+    }
+
+    .article-list {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    /* Article Card */
+    .read-card {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .read-media-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Thumbnail Preview */
+    .read-preview {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #f7f7f7;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .read-card:hover .read-preview {
+      opacity: 0.92;
+      transform: scale(1.01);
+    }
+
+    .read-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+    }
+
+    /* Article Metadata */
+    .read-meta {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Host Grotesk', sans-serif;
+    }
+
+    .read-date-author {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .read-title {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    .read-excerpt {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #222222;
+      font-weight: 400;
+    }
+
+    /* Glassy Overlay Modal */
+    .read-overlay {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      right: 30px;
+      bottom: 30px;
+      width: calc(100vw - 60px);
+      height: calc(100vh - 60px);
+      background: var(--overlay-blue);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .read-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Inner Card Soft Box */
+    .article-modal-box {
+      background: var(--soft-box-bg);
+      border: 1px solid var(--soft-box-border);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+      width: 90%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 32px 36px;
+    }
+
+    .article-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .article-modal-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+      font-weight: 400;
+    }
+
+    .modal-close-btn {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #111111;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      padding: 5px 16px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.2px;
+    }
+
+    .modal-close-btn:hover {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.3);
+      color: #000000;
+    }
+
+    .article-modal-body {
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .article-modal-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .article-modal-body::-webkit-scrollbar-thumb {
+      background: #d1d1d6;
+      border-radius: 4px;
+    }
+
+    .article-modal-title {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+
+    .article-modal-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Content Body & Inline Images */
+    .article-content-text {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #222222;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .article-body-img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin: 6px 0;
+      display: block;
+      border: 1px solid var(--border-color);
+    }
+
+    .article-body-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 6px;
+    }
+
+    /* Comments Section */
+    .discourse-container {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .discourse-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .discourse-indicator {
+      width: 7px;
+      height: 7px;
+      background: #bdccd4;
+      border-radius: 50%;
+    }
+
+    .discourse-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: lowercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+    }
+
+    .chat-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .chat-bubble {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .chat-bubble:hover {
+      background: #ffffff;
+    }
+
+    .chat-reply-bubble {
+      margin-left: 18px;
+      margin-top: 6px;
+      border-left: 2px solid #bdccd4;
+      background: rgba(250, 250, 252, 0.9);
+    }
+
+    .chat-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .chat-handle {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .chat-timestamp {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .chat-message-text {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #222222;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .chat-reply-trigger {
+      align-self: flex-start;
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      padding: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .chat-reply-trigger:hover {
+      color: #000000;
+      text-decoration: underline;
+    }
+
+    .chat-input-wrapper {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chat-author-input {
+      font-family: inherit;
+      font-size: 11px;
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      outline: none;
+      background: #ffffff;
+      width: 140px;
+    }
+
+    .chat-author-input:focus, .chat-textarea-input:focus {
+      border-color: #bdccd4;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-textarea-input {
+      flex: 1;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      outline: none;
+      background: #ffffff;
+      resize: none;
+      min-height: 38px;
+    }
+
+    .chat-send-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 38px;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .chat-send-btn:hover {
+      background: #333333;
+    }
+
+    .reply-box-container {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-header-bar { top: 25px; left: 16px; gap: 12px; width: calc(100vw - 32px); justify-content: space-between; }
+      .nav-item img { height: 24px; }
+      .read-container { margin: calc(120px + 28px) auto 12vh auto; padding: 0 16px; }
+      .read-card { grid-template-columns: 1fr; gap: 20px; }
+      .submit-window { padding: 20px; margin-bottom: 40px; }
+      .submit-window-body { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+      /* Full-screen reader mode */
+      .read-overlay {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        background: #ffffff;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .article-modal-box {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        background: #ffffff;
+        padding: 0;
+      }
+
+      /* Sticky glassy header */
+      .article-modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        margin-bottom: 0;
+        padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px 14px 20px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .modal-close-btn {
+        padding: 7px 16px;
+        font-size: 13px;
+      }
+
+      .article-modal-body {
+        padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 48px) 20px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .article-modal-title {
+        font-size: 25px;
+        letter-spacing: -0.3px;
+      }
+
+      .article-modal-subtitle {
+        font-size: 14.5px;
+        margin-bottom: 22px;
+      }
+
+      .article-content-text {
+        font-size: 17px;
+        line-height: 1.75;
+        gap: 20px;
+      }
+
+      .article-body-img {
+        border-radius: 8px;
+        margin: 8px 0;
+      }
+
+      .article-body-caption {
+        font-size: 12.5px;
+      }
+
+      .chat-author-input { width: 100%; }
+      .chat-input-row { flex-direction: column; }
+      .chat-send-btn { width: 100%; }
+      .custom-red-cursor { display: none; } /* Hide custom cursor on touch devices */
+      * { cursor: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Soft Square Red Cursor -->
+  <div class="custom-red-cursor" id="custom-red-cursor"></div>
+
+  <!-- Pitch Submission Modal (opens in place, no page navigation) -->
+  <div class="modal-overlay" id="pitchModal">
+    <div class="modal-content">
+      <button class="modal-close-x" onclick="closePitchModal()">close</button>
+
+      <div class="pitch-modal-header">
+        <h1>duchess open call</h1>
+        <p>submit a draft or pitch a concept.</p>
+      </div>
+
+      <form id="duchessForm" onsubmit="handlePitchSubmit(event)" novalidate>
+
+        <!-- contributor info -->
+        <div class="form-section">
+          <div class="section-title">contributor</div>
+          <div class="input-row">
+            <input type="text" class="duchess-input req-input" id="f-name" placeholder="name / handle">
+            <input type="email" class="duchess-input req-input" id="f-email" placeholder="email address">
+          </div>
+          <input type="text" class="duchess-input req-input" id="f-title" placeholder="working title or concept">
+        </div>
+
+        <!-- submission type -->
+        <div class="form-section">
+          <div class="section-title">submission type</div>
+          <div class="options-grid" id="type-group">
+            <div class="option-card" onclick="selectPitchOption('type', 'article', this)">article</div>
+            <div class="option-card" onclick="selectPitchOption('type', 'op-ed', this)">op-ed</div>
+            <div class="option-card" onclick="selectPitchOption('type', 'poem', this)">poem</div>
+            <div class="option-card" onclick="selectPitchOption('type', 'review', this)">review</div>
+            <div class="option-card" onclick="selectPitchOption('type', 'other', this)">other</div>
+          </div>
+          <input type="hidden" id="f-type" class="req-input">
+        </div>
+
+        <!-- piece status -->
+        <div class="form-section">
+          <div class="section-title">piece status</div>
+          <div class="options-grid" id="status-group">
+            <div class="option-card" onclick="togglePitchStatus('finished', this)">finished draft</div>
+            <div class="option-card" onclick="togglePitchStatus('pitch', this)">pitch / proposal</div>
+          </div>
+          <input type="hidden" id="f-status" class="req-input">
+
+          <div class="logic-block" id="block-finished">
+            <input type="text" class="duchess-input" id="f-link" placeholder="link to finished piece (doc, pdf, are.na)">
+          </div>
+
+          <div class="logic-block" id="block-pitch">
+            <textarea class="duchess-input" id="f-pitch" placeholder="pitch concept / summary"></textarea>
+            <input type="text" class="duchess-input" id="f-time" placeholder="preferred pitch meeting time">
+          </div>
+        </div>
+
+        <!-- visual direction -->
+        <div class="form-section">
+          <div class="section-title">visual direction</div>
+          <div class="options-grid" id="visual-group">
+            <div class="option-card" onclick="togglePitchVisuals('custom', this)">specific vision</div>
+            <div class="option-card" onclick="togglePitchVisuals('trusted', this)">trust duchess</div>
+          </div>
+          <input type="hidden" id="f-visuals" class="req-input">
+
+          <div class="logic-block" id="block-visuals">
+            <input type="text" class="duchess-input" id="f-moodboard" placeholder="moodboard / reference link">
+          </div>
+        </div>
+
+        <button type="submit" class="pitch-submit-btn">submit to duchess</button>
+        <div class="pitch-form-status" id="pitch-form-status"></div>
+
+      </form>
+    </div>
+  </div>
+
+  <header class="nav-header-bar">
+    <a href="index.html" class="nav-item"><img src="info.png" alt="info"></a>
+    <a href="projects.html" class="nav-item"><img src="projects.png" alt="projects"></a>
+    <a href="blog.html" class="nav-item"><img src="blog.png" alt="blog"></a>
+    <a href="read.html" class="nav-item active"><img src="read.png" alt="read"></a>
+    <a href="radio.html" class="nav-item"><img src="radio.png" alt="radio"></a>
+    <a href="contact.html" class="nav-item"><img src="contact.png" alt="contact"></a>
+  </header>
+
+  <main class="read-container">
+
+    <!-- Writer Submission Box -->
+    <section class="submit-window">
+      <div class="submit-window-header">
+        <span class="submit-tag">open call</span>
+        <span class="submit-status">accepting pitches</span>
+      </div>
+      <div class="submit-window-body">
+        <h2 class="submit-window-title">Submit a Piece</h2>
+        <button type="button" class="submit-piece-btn" onclick="openPitchModal()">
+          submit pitch &rarr;
+        </button>
+      </div>
+    </section>
+
+    <!-- Articles List -->
+    <div class="article-list" id="article-list">
+      <p style="font-size: 13px; color: var(--text-muted);">Loading articles...</p>
+    </div>
+  </main>
+
+  <!-- Glassy Overlay Modal -->
+  <div class="read-overlay" id="article-overlay" onclick="handleOverlayClick(event)">
+    <div class="article-modal-box">
+      
+      <div class="article-modal-header">
+        <span class="article-modal-date" id="article-date"></span>
+        <button class="modal-close-btn" onclick="closeArticleModal()">back</button>
+      </div>
+
+      <div class="article-modal-body">
+        <h1 class="article-modal-title" id="article-title">Loading...</h1>
+        <div class="article-modal-subtitle" id="article-subtitle"></div>
+
+        <div class="article-content-text" id="article-body"></div>
+
+        <!-- Comments Section -->
+        <div class="discourse-container">
+          <div class="discourse-header-row">
+            <div class="discourse-indicator"></div>
+            <div class="discourse-title">comments</div>
+          </div>
+
+          <div class="chat-stream" id="chat-stream">
+            <p style="font-size: 11px; color: var(--text-muted);">Loading comments...</p>
+          </div>
+
+          <!-- Comment Input -->
+          <div class="chat-input-wrapper">
+            <input type="text" id="chat-author" class="chat-author-input" placeholder="user" maxlength="24">
+            <div class="chat-input-row">
+              <textarea id="chat-text" class="chat-textarea-input" rows="1" placeholder="Leave a comment..."></textarea>
+              <button class="chat-send-btn" onclick="postChatMessage(null)">Send</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Custom Soft Red Square Cursor Logic
+    const redCursor = document.getElementById('custom-red-cursor');
+
+    document.addEventListener('mousemove', (e) => {
+      redCursor.style.left = e.clientX + 'px';
+      redCursor.style.top = e.clientY + 'px';
+    });
+
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('a, button, .read-card, input, textarea, .chat-reply-trigger, .option-card')) {
+        document.body.classList.add('cursor-hover');
+      } else {
+        document.body.classList.remove('cursor-hover');
+      }
+    });
+
+    // 1. Firebase Setup
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUP9uKcggdBj9fr44bO6vkUZTug8uk1ao",
+      authDomain: "duchess-20a9a.firebaseapp.com",
+      databaseURL: "https://duchess-20a9a-default-rtdb.firebaseio.com",
+      projectId: "duchess-20a9a",
+      storageBucket: "duchess-20a9a.firebasestorage.app",
+      messagingSenderId: "1007104387951",
+      appId: "1:1007104387951:web:65d51067c68f8f324b169a",
+      measurementId: "G-HV729TFY93"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let articlesData = [];
+    let currentArticleId = null;
+
+    // 2. Fetch Articles
+    async function fetchArticles() {
+      const container = document.getElementById('article-list');
+
+      try {
+        const snapshot = await db.collection("articles").get();
+        articlesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        if (articlesData.length === 0) {
+          container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No articles found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        articlesData.forEach((article, index) => {
+          const author = article.author || "";
+          const date = article.date || "";
+          const thumbUrl = article.thumbnailUrl || "";
+
+          const card = document.createElement('article');
+          card.className = 'read-card';
+          card.onclick = () => openArticleModal(index);
+          
+          card.innerHTML = `
+            <div class="read-media-col">
+              <div class="read-preview">
+                ${thumbUrl ? `<img src="${thumbUrl}" loading="lazy" alt="${article.title || 'Article thumbnail'}">` : ''}
+              </div>
+            </div>
+            <div class="read-meta">
+              <div class="read-date-author">${date}${date && author ? ' - ' : ''}${author}</div>
+              <h2 class="read-title">${article.title || 'Untitled'}</h2>
+              <p class="read-excerpt">${article.byline || article.subtitle || ''}</p>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error("Firestore fetch error:", error);
+        container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">Error loading articles.</p>`;
+      }
+    }
+
+    // 3. Open Modal
+    function openArticleModal(index) {
+      const article = articlesData[index];
+      if (!article) return;
+
+      currentArticleId = article.id;
+
+      const overlay = document.getElementById('article-overlay');
+      const titleElem = document.getElementById('article-title');
+      const dateElem = document.getElementById('article-date');
+      const subtitleElem = document.getElementById('article-subtitle');
+      const bodyElem = document.getElementById('article-body');
+
+      const author = article.author || "";
+      const date = article.date || "";
+
+      titleElem.innerText = article.title || "Untitled Article";
+      dateElem.innerText = `${date}${date && author ? ' - ' : ''}${author}`;
+      subtitleElem.innerText = article.byline || article.subtitle || "";
+
+      // Render Body Elements
+      if (Array.isArray(article.body)) {
+        bodyElem.innerHTML = article.body.map(item => {
+          if (typeof item === 'string') {
+            return `<p>${item}</p>`;
+          } else if (typeof item === 'object' && item !== null) {
+            if (item.type === 'image' || item.url) {
+              const captionHtml = item.caption ? `<div class="article-body-caption">${item.caption}</div>` : '';
+              return `<img class="article-body-img" src="${item.url}" alt="${item.caption || 'Article image'}" />${captionHtml}`;
+            }
+          }
+          return '';
+        }).join('');
+      } else if (typeof article.body === 'string') {
+        bodyElem.innerHTML = `<p>${article.body}</p>`;
+      } else {
+        bodyElem.innerHTML = `<p>No content available.</p>`;
+      }
+
+      loadChatStream(currentArticleId);
+
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 4. Load Comments
+    async function loadChatStream(articleId) {
+      const streamContainer = document.getElementById('chat-stream');
+      streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">Loading comments...</p>`;
+
+      try {
+        const snapshot = await db.collection('articles')
+          .doc(articleId)
+          .collection('comments')
+          .orderBy('createdAt', 'asc')
+          .get();
+
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderChatMessages(messages);
+      } catch (err) {
+        console.error("Chat fetch error:", err);
+        streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">Unable to load comments.</p>`;
+      }
+    }
+
+    function renderChatMessages(messages) {
+      const streamContainer = document.getElementById('chat-stream');
+      streamContainer.innerHTML = '';
+
+      if (messages.length === 0) {
+        streamContainer.innerHTML = `<p style="font-size: 11px; color: var(--text-muted);">comments</p>`;
+        return;
+      }
+
+      const parentMsgs = messages.filter(m => !m.parentId);
+      const replyMsgs = messages.filter(m => m.parentId);
+
+      parentMsgs.forEach(parent => {
+        const bubble = createChatBubble(parent, false);
+        
+        const nested = replyMsgs.filter(r => r.parentId === parent.id);
+        nested.forEach(reply => {
+          const replyBubble = createChatBubble(reply, true);
+          bubble.appendChild(replyBubble);
+        });
+
+        streamContainer.appendChild(bubble);
+      });
+    }
+
+    function createChatBubble(msg, isReply = false) {
+      const bubble = document.createElement('div');
+      bubble.className = isReply ? 'chat-bubble chat-reply-bubble' : 'chat-bubble';
+
+      let timeStr = '';
+      if (msg.createdAt && msg.createdAt.toDate) {
+        const dateObj = msg.createdAt.toDate();
+        timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      bubble.innerHTML = `
+        <div class="chat-meta">
+          <span class="chat-handle">${msg.author || 'user'}</span>
+          <span class="chat-timestamp">${timeStr}</span>
+        </div>
+        <div class="chat-message-text">${msg.text || ''}</div>
+        ${!isReply ? `<button class="chat-reply-trigger" onclick="toggleReplyBox('${msg.id}')">&rdsh; reply</button>` : ''}
+        <div id="reply-box-${msg.id}" class="reply-box-container"></div>
+      `;
+
+      return bubble;
+    }
+
+    // 5. Toggle Inline Reply Box
+    function toggleReplyBox(parentId) {
+      const container = document.getElementById(`reply-box-${parentId}`);
+      if (container.innerHTML !== '') {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="chat-input-wrapper" style="margin-top: 6px;">
+          <input type="text" id="reply-author-${parentId}" class="chat-author-input" placeholder="user" maxlength="24">
+          <div class="chat-input-row">
+            <textarea id="reply-text-${parentId}" class="chat-textarea-input" rows="1" placeholder="Reply..."></textarea>
+            <button class="chat-send-btn" onclick="postChatMessage('${parentId}')">Reply</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. Post Comment
+    async function postChatMessage(parentId = null) {
+      if (!currentArticleId) return;
+
+      const authorInput = parentId ? document.getElementById(`reply-author-${parentId}`) : document.getElementById('chat-author');
+      const textInput = parentId ? document.getElementById(`reply-text-${parentId}`) : document.getElementById('chat-text');
+
+      const author = authorInput.value.trim() || 'user';
+      const text = textInput.value.trim();
+
+      if (!text) return;
+
+      try {
+        await db.collection('articles')
+          .doc(currentArticleId)
+          .collection('comments')
+          .add({
+            author: author,
+            text: text,
+            parentId: parentId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        authorInput.value = '';
+        textInput.value = '';
+
+        loadChatStream(currentArticleId);
+      } catch (err) {
+        console.error("Error posting comment:", err);
+      }
+    }
+
+    function closeArticleModal() {
+      const overlay = document.getElementById('article-overlay');
+      overlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      currentArticleId = null;
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'article-overlay') {
+        closeArticleModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeArticleModal();
+        closePitchModal();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', fetchArticles);
+
+    // ---- Pitch Submission Modal ----
+    let pitchErrorTimeout = null;
+
+    function openPitchModal() {
+      document.getElementById('pitchModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePitchModal() {
+      document.getElementById('pitchModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // close modal on background click
+    document.getElementById('pitchModal').addEventListener('click', function(e) {
+      if (e.target === this) closePitchModal();
+    });
+
+    // clear error alert when user types
+    document.addEventListener('input', function(e) {
+      if (e.target.classList.contains('duchess-input')) {
+        clearPitchError();
+      }
+    });
+
+    function clearPitchError() {
+      const status = document.getElementById('pitch-form-status');
+      if (status.classList.contains('error')) {
+        status.className = 'pitch-form-status';
+        status.innerText = '';
+        if (pitchErrorTimeout) clearTimeout(pitchErrorTimeout);
+      }
+    }
+
+    // generic option selector for submission type / status / visuals
+    function selectPitchOption(group, val, el) {
+      clearPitchError();
+      const parent = el.parentElement;
+      const cards = parent.querySelectorAll('.option-card');
+      cards.forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('f-' + group).value = val;
+    }
+
+    // status toggle (finished draft vs pitch/proposal)
+    function togglePitchStatus(val, el) {
+      selectPitchOption('status', val, el);
+      const finished = document.getElementById('block-finished');
+      const pitch = document.getElementById('block-pitch');
+
+      finished.classList.remove('active');
+      pitch.classList.remove('active');
+
+      if (val === 'finished') finished.classList.add('active');
+      if (val === 'pitch') pitch.classList.add('active');
+    }
+
+    // visuals toggle (specific vision vs trust duchess)
+    function togglePitchVisuals(val, el) {
+      selectPitchOption('visuals', val, el);
+      const visuals = document.getElementById('block-visuals');
+      visuals.classList.remove('active');
+
+      if (val === 'custom') visuals.classList.add('active');
+    }
+
+    // form submission & validation
+    async function handlePitchSubmit(e) {
+      e.preventDefault();
+      const status = document.getElementById('pitch-form-status');
+      let isValid = true;
+
+      if (pitchErrorTimeout) clearTimeout(pitchErrorTimeout);
+      status.className = 'pitch-form-status';
+
+      // 1. check all base required fields
+      const reqInputs = document.querySelectorAll('#duchessForm .req-input');
+      reqInputs.forEach(input => {
+        if (!input.value.trim()) isValid = false;
+      });
+
+      // 2. check dynamic fields based on active logic blocks
+      const activeBlocks = document.querySelectorAll('#duchessForm .logic-block.active');
+      activeBlocks.forEach(block => {
+        const blockInputs = block.querySelectorAll('.duchess-input');
+        blockInputs.forEach(input => {
+          if (!input.value.trim()) isValid = false;
+        });
+      });
+
+      if (!isValid) {
+        status.innerText = 'please fill out this field';
+        status.classList.add('error');
+        pitchErrorTimeout = setTimeout(() => {
+          status.className = 'pitch-form-status';
+          status.innerText = '';
+        }, 3000);
+        return;
+      }
+
+      // 3. build the pitch document from current field values
+      const statusVal = document.getElementById('f-status').value;
+      const visualsVal = document.getElementById('f-visuals').value;
+
+      const pitchDoc = {
+        name: document.getElementById('f-name').value.trim(),
+        email: document.getElementById('f-email').value.trim(),
+        title: document.getElementById('f-title').value.trim(),
+        type: document.getElementById('f-type').value,
+        status: statusVal,
+        visuals: visualsVal,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (statusVal === 'finished') {
+        pitchDoc.link = document.getElementById('f-link').value.trim();
+      } else if (statusVal === 'pitch') {
+        pitchDoc.pitchSummary = document.getElementById('f-pitch').value.trim();
+        pitchDoc.preferredTime = document.getElementById('f-time').value.trim();
+      }
+
+      if (visualsVal === 'custom') {
+        pitchDoc.moodboardUrl = document.getElementById('f-moodboard').value.trim();
+      }
+
+      // 4. write to Firestore
+      const submitBtn = document.querySelector('#duchessForm .pitch-submit-btn');
+      submitBtn.disabled = true;
+
+      try {
+        await db.collection('pitches').add(pitchDoc);
+
+        status.innerText = 'submitted thank you';
+        status.classList.add('success');
+
+        setTimeout(() => {
+          status.className = 'pitch-form-status';
+          status.innerText = '';
+          document.getElementById('duchessForm').reset();
+
+          // reset selections and blocks
+          document.querySelectorAll('#duchessForm .option-card').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('#duchessForm .logic-block').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('#duchessForm input[type="hidden"]').forEach(i => i.value = '');
+
+          closePitchModal();
+        }, 2500);
+      } catch (err) {
+        console.warn('Pitch submit error:', err);
+        status.innerText = 'something went wrong, try again';
+        status.classList.add('error');
+        pitchErrorTimeout = setTimeout(() => {
+          status.className = 'pitch-form-status';
+          status.innerText = '';
+        }, 3000);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>
