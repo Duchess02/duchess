@@ -64,6 +64,130 @@
       padding: 0 24px;
     }
 
+    /* ============ RSVP SECTION ============ */
+    .rsvp-card {
+      --rsvp-bg: #f4f4f4;
+      --rsvp-border: #d6d6d6;
+      --rsvp-accent: #3a3a3a;
+      --rsvp-accent-hover: #1f1f1f;
+      --rsvp-error: #b3261e;
+
+      background: var(--rsvp-bg);
+      border: 1px solid var(--rsvp-border);
+      border-radius: 16px;
+      padding: 28px 30px 26px;
+      margin-bottom: 80px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    }
+
+    .rsvp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .rsvp-tag {
+      color: var(--rsvp-accent);
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .rsvp-status {
+      color: #8a8a8a;
+      letter-spacing: 0.03em;
+    }
+
+    .rsvp-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--text-main);
+      margin-bottom: 18px;
+    }
+
+    .rsvp-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .rsvp-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rsvp-field label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .rsvp-field label span { color: var(--rsvp-accent); }
+
+    .rsvp-field input {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 15px;
+      color: var(--text-main);
+      background: #ffffff;
+      border: 1px solid var(--rsvp-border);
+      border-radius: 6px;
+      padding: 0 14px;
+      height: 46px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .rsvp-field input::placeholder { color: #b5b5b5; }
+
+    .rsvp-field input:focus {
+      border-color: var(--rsvp-accent);
+      box-shadow: 0 0 0 3px rgba(58, 58, 58, 0.12);
+    }
+
+    .rsvp-btn {
+      font-family: 'Host Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #ffffff;
+      background: var(--rsvp-accent);
+      border: none;
+      border-radius: 6px;
+      padding: 0 24px;
+      height: 46px;
+      margin-top: 23px; /* lines up with the inputs (label height + gap) */
+      white-space: nowrap;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='sans-serif' font-size='16' fill='%23bdccd4'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .rsvp-btn:hover { background: var(--rsvp-accent-hover); }
+    .rsvp-btn:active { transform: translateY(1px); }
+    .rsvp-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .rsvp-msg {
+      margin-top: 14px;
+      font-size: 13px;
+      min-height: 1.2em;
+      color: var(--text-muted);
+    }
+    .rsvp-msg.error { color: var(--rsvp-error); }
+    .rsvp-msg.success { color: var(--text-main); font-weight: 500; }
+
+    /* honeypot: hidden from people, bots fill it in */
+    .rsvp-hp {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      height: 0;
+      width: 0;
+    }
+
     .projects-list {
       display: flex;
       flex-direction: column;
@@ -361,6 +485,9 @@
       .nav-header-bar { top: 25px; left: 16px; gap: 12px; width: calc(100vw - 32px); justify-content: space-between; }
       .nav-item img { height: 24px; }
       .projects-container { margin: calc(120px + 28px) auto 12vh auto; padding: 0 16px; }
+      .rsvp-card { padding: 22px 18px; margin-bottom: 56px; }
+      .rsvp-form { grid-template-columns: 1fr; }
+      .rsvp-btn { margin-top: 4px; width: 100%; }
       .project-card { grid-template-columns: 1fr; gap: 20px; }
       .slideshow-overlay { padding: 16px; }
       .slideshow-card { flex-direction: column; height: auto; max-height: 85vh; }
@@ -386,6 +513,37 @@
   </header>
 
   <main class="projects-container">
+
+    <!-- RSVP SECTION -->
+    <section class="rsvp-card" id="rsvp">
+      <div class="rsvp-top">
+        <span class="rsvp-tag">rsvp</span>
+        <span class="rsvp-status">spots are limited</span>
+      </div>
+
+      <h2 class="rsvp-title">Save Your Spot</h2>
+
+      <form class="rsvp-form" id="rsvp-form" novalidate>
+        <div class="rsvp-field">
+          <label for="rsvp-name">name <span>*</span></label>
+          <input id="rsvp-name" name="name" type="text" placeholder="Your full name"
+                 autocomplete="name" required minlength="2" maxlength="100">
+        </div>
+
+        <div class="rsvp-field">
+          <label for="rsvp-email">email <span>*</span></label>
+          <input id="rsvp-email" name="email" type="email" placeholder="you@email.com"
+                 autocomplete="email" required maxlength="200">
+        </div>
+
+        <button class="rsvp-btn" id="rsvp-submit" type="submit">submit rsvp &rarr;</button>
+
+        <input class="rsvp-hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+      </form>
+
+      <p class="rsvp-msg" id="rsvp-msg" role="status" aria-live="polite"></p>
+    </section>
+
     <div class="projects-list" id="projects-list">
       <!-- Firestore dynamic content populates here -->
     </div>
@@ -420,7 +578,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUP9uKcggdBj9fr44bO6vkUZTug8uk1ao",
@@ -439,6 +597,49 @@
     let projectsData = [];
     let currentProjectIndex = 0;
     let currentSlideIndex = 0;
+
+    // ============ RSVP FORM ============
+    const rsvpForm = document.getElementById('rsvp-form');
+    const rsvpBtn = document.getElementById('rsvp-submit');
+    const rsvpMsg = document.getElementById('rsvp-msg');
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function rsvpSay(text, type = "") {
+      rsvpMsg.textContent = text;
+      rsvpMsg.className = "rsvp-msg " + type;
+    }
+
+    rsvpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = new FormData(rsvpForm);
+      if (data.get('company')) return; // honeypot tripped, silently ignore
+
+      const name = String(data.get('name') || '').trim();
+      const email = String(data.get('email') || '').trim().toLowerCase();
+
+      if (name.length < 2) return rsvpSay("Please enter your name.", "error");
+      if (!EMAIL_RE.test(email)) return rsvpSay("Please enter a valid email.", "error");
+
+      rsvpBtn.disabled = true;
+      rsvpSay("Sending…");
+
+      try {
+        await addDoc(collection(db, "rsvps"), {
+          name,
+          email,
+          createdAt: serverTimestamp(),
+          source: location.pathname
+        });
+        rsvpForm.reset();
+        rsvpSay("You're on the list. See you there!", "success");
+      } catch (err) {
+        console.error(err);
+        rsvpSay("Something went wrong. Please try again.", "error");
+      } finally {
+        rsvpBtn.disabled = false;
+      }
+    });
 
     // Fetch dynamic projects from Firestore Database
     async function fetchProjects() {
