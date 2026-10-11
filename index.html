@@ -202,11 +202,15 @@
       cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ctext x='0' y='14' font-family='monospace' font-size='16' fill='%23FFFFFF'%3E%3E%3C/text%3E%3C/svg%3E") 8 8, pointer;
     }
     
-    .nav-item img {
-      height: 38px;
-      width: auto;
-      display: block;
-    }
+.nav-item img {
+  height: 38px;
+  width: auto;
+  display: block;
+}
+
+.nav-item[href="radio.html"] img {radio.png)
+  height: 44px;
+}
 
     .nav-item.active { 
       pointer-events: none; 
@@ -608,7 +612,7 @@
     </div>
 
     <div class="nav-item-wrapper">
-      <a href="radio.html" class="nav-item"><img src="radio2.png" alt="radio"></a>
+      <a href="radio.html" class="nav-item"><img src="radio.png" alt="radio"></a>
       <div class="apple-popover popover-radio">
         <h2 class="popover-title">radio</h2>
         <p class="popover-desc">Live audio stream, mixes, and radio shows.</p>
